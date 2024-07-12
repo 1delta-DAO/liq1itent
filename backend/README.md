@@ -14,3 +14,17 @@ yarn
 ```ts
 yarn start
 ```
+
+## Use
+
+Go to `localhost:4000/api` to see the API documentation.
+
+#### Create a new order
+```bash
+/order/create
+```
+
+#### Get all orders
+```bash
+/order/get
+```
