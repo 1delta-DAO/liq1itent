@@ -3,4 +3,5 @@
 /* eslint-disable */
 export * as libraries from "./libraries";
 export * as lzApp from "./lzApp";
+export * as mock from "./mock";
 export * as oft from "./oft";

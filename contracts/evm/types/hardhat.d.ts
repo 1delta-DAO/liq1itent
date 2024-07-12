@@ -94,6 +94,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.NonblockingLzApp__factory>;
     getContractFactory(
+      name: "MockERC20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MockERC20__factory>;
+    getContractFactory(
       name: "BaseOFTV2",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BaseOFTV2__factory>;
@@ -259,6 +263,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.NonblockingLzApp>;
     getContractAt(
+      name: "MockERC20",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MockERC20>;
+    getContractAt(
       name: "BaseOFTV2",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -420,6 +429,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.NonblockingLzApp>;
     deployContract(
+      name: "MockERC20",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockERC20>;
+    deployContract(
       name: "BaseOFTV2",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.BaseOFTV2>;
@@ -584,6 +597,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.NonblockingLzApp>;
+    deployContract(
+      name: "MockERC20",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockERC20>;
     deployContract(
       name: "BaseOFTV2",
       args: any[],
