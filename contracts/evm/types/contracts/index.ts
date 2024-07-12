@@ -5,5 +5,7 @@ import type * as libraries from "./libraries";
 export type { libraries };
 import type * as lzApp from "./lzApp";
 export type { lzApp };
+import type * as mock from "./mock";
+export type { mock };
 import type * as oft from "./oft";
 export type { oft };

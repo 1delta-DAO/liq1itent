@@ -46,6 +46,8 @@ export type { LZEndpointMock } from "./contracts/lzApp/mocks/LZEndpointMock";
 export { LZEndpointMock__factory } from "./factories/contracts/lzApp/mocks/LZEndpointMock__factory";
 export type { NonblockingLzApp } from "./contracts/lzApp/NonblockingLzApp";
 export { NonblockingLzApp__factory } from "./factories/contracts/lzApp/NonblockingLzApp__factory";
+export type { MockERC20 } from "./contracts/mock/MockERC20";
+export { MockERC20__factory } from "./factories/contracts/mock/MockERC20__factory";
 export type { BaseOFTV2 } from "./contracts/oft/BaseOFTV2";
 export { BaseOFTV2__factory } from "./factories/contracts/oft/BaseOFTV2__factory";
 export type { BaseOFTWithFee } from "./contracts/oft/fee/BaseOFTWithFee";

@@ -1,6 +1,9 @@
-const { expect } = require("chai")
-const { ethers } = require("hardhat")
-const { BigNumber } = require("@ethersproject/bignumber")
+import { AbiCoder, MaxUint256, parseEther, solidityPacked, ZeroAddress } from "ethers"
+import { ethers } from 'hardhat';
+
+import { ERC20__factory, LZEndpointMock, LZEndpointMock__factory, MockERC20, MockERC20__factory, OFTV2, OFTV2__factory, ProxyOFTV2, ProxyOFTV2__factory } from "../types"
+import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers"
+import { expect } from "chai";
 
 describe("OFT v2: ", function () {
     const localChainId = 1
@@ -8,40 +11,59 @@ describe("OFT v2: ", function () {
     const name = "OmnichainFungibleToken"
     const symbol = "OFT"
     const sharedDecimals = 5
-    // const globalSupply = ethers.utils.parseUnits("1000000", 18)
+    // const globalSupply = parseUnits("1000000", 18)
 
-    let LZEndpointMock, ERC20, ProxyOFTV2, OFTV2
-    let localEndpoint, remoteEndpoint, localOFT, remoteOFT, erc20, remotePath, localPath
-    let owner, alice, bob
+    let localEndpoint: LZEndpointMock
+    let remoteEndpoint: LZEndpointMock
+    let remotePath, localPath
+    let owner: SignerWithAddress;
+    let alice: SignerWithAddress;
+    let bob: SignerWithAddress
+    let ownerAddress: string;
+    let aliceAddress: string;
+    let bobAddress: string
+    let localOFT: ProxyOFTV2
+    let remoteOFT: OFTV2
+    let erc20: MockERC20
 
-    let defaultAdapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [1, 200000])
+    let localOFTAddress: string
+    let remoteOFTAddress: string
+    let erc20Address: string
+    let abiCoder: AbiCoder
+    let localEndpointAddress: string
+    let remoteEndpointAddress: string
+
+    let defaultAdapterParams = solidityPacked(["uint16", "uint256"], [1, 200000])
 
     before(async function () {
-        LZEndpointMock = await ethers.getContractFactory("LZEndpointMock")
-        ProxyOFTV2 = await ethers.getContractFactory("ProxyOFTV2")
-        OFTV2 = await ethers.getContractFactory("OFTV2")
-        ERC20 = await ethers.getContractFactory("ERC20Mock")
-        owner = (await ethers.getSigners())[0]
-        alice = (await ethers.getSigners())[1]
-        bob = (await ethers.getSigners())[2]
+        [owner, alice, bob] = await ethers.getSigners();
+        ownerAddress = await owner.getAddress();
+        aliceAddress = await alice.getAddress();
+        bobAddress = await bob.getAddress()
+        abiCoder = (new ethers.AbiCoder())
     })
 
     beforeEach(async function () {
-        localEndpoint = await LZEndpointMock.deploy(localChainId)
-        remoteEndpoint = await LZEndpointMock.deploy(remoteChainId)
+        localEndpoint = await new LZEndpointMock__factory(owner).deploy(localChainId)
+        remoteEndpoint = await new LZEndpointMock__factory(owner).deploy(remoteChainId)
+        localEndpointAddress = await localEndpoint.getAddress()
+        remoteEndpointAddress = await remoteEndpoint.getAddress()
 
         // create two OmnichainFungibleToken instances
-        erc20 = await ERC20.deploy("ERC20", "ERC20")
-        localOFT = await ProxyOFTV2.deploy(erc20.address, sharedDecimals, localEndpoint.address)
-        remoteOFT = await OFTV2.deploy(name, symbol, sharedDecimals, remoteEndpoint.address)
+        erc20 = await new MockERC20__factory(owner).deploy("ERC20", "ERC20", 18)
+        erc20Address = await erc20.getAddress()
+        localOFT = await new ProxyOFTV2__factory(owner).deploy(erc20Address, sharedDecimals, localEndpointAddress)
+        remoteOFT = await new OFTV2__factory(owner).deploy(name, symbol, sharedDecimals, remoteEndpointAddress)
+        localOFTAddress = await localOFT.getAddress()
+        remoteOFTAddress = await remoteOFT.getAddress()
 
         // internal bookkeeping for endpoints (not part of a real deploy, just for this test)
-        await localEndpoint.setDestLzEndpoint(remoteOFT.address, remoteEndpoint.address)
-        await remoteEndpoint.setDestLzEndpoint(localOFT.address, localEndpoint.address)
+        await localEndpoint.setDestLzEndpoint(remoteOFTAddress, remoteEndpointAddress)
+        await remoteEndpoint.setDestLzEndpoint(localOFTAddress, localEndpointAddress)
 
         // set each contracts source address so it can send to each other
-        remotePath = ethers.utils.solidityPack(["address", "address"], [remoteOFT.address, localOFT.address])
-        localPath = ethers.utils.solidityPack(["address", "address"], [localOFT.address, remoteOFT.address])
+        remotePath = solidityPacked(["address", "address"], [remoteOFTAddress, localOFTAddress])
+        localPath = solidityPacked(["address", "address"], [localOFTAddress, remoteOFTAddress])
 
         await localOFT.setMinDstGas(remoteChainId, 0, 200000)
         await localOFT.setMinDstGas(remoteChainId, 1, 200000)
@@ -53,90 +75,90 @@ describe("OFT v2: ", function () {
     })
 
     it("send tokens from proxy oft and receive them back", async function () {
-        const initialAmount = ethers.utils.parseEther("1.00000001") // 1 ether
-        const amount = ethers.utils.parseEther("1.00000000")
-        const dust = ethers.utils.parseEther("0.00000001")
-        await erc20.mint(alice.address, initialAmount)
+        const initialAmount = parseEther("1.00000001") // 1 ether
+        const amount = parseEther("1.00000000")
+        const dust = parseEther("0.00000001")
+        await erc20.mint(aliceAddress, initialAmount)
 
         // verify alice has tokens and bob has no tokens on remote chain
-        expect(await erc20.balanceOf(alice.address)).to.be.equal(initialAmount)
-        expect(await remoteOFT.balanceOf(bob.address)).to.be.equal(0)
+        expect(await erc20.balanceOf(aliceAddress)).to.be.equal(initialAmount)
+        expect(await remoteOFT.balanceOf(bobAddress)).to.be.equal(0)
 
         // alice sends tokens to bob on remote chain
         // approve the proxy to swap your tokens
-        await erc20.connect(alice).approve(localOFT.address, initialAmount)
+        await erc20.connect(alice).approve(localOFTAddress, initialAmount)
 
         // swaps token to remote chain
-        const bobAddressBytes32 = ethers.utils.defaultAbiCoder.encode(["address"], [bob.address])
+        const bobAddressBytes32 = (new ethers.AbiCoder()).encode(["address"], [bobAddress])
         let nativeFee = (await localOFT.estimateSendFee(remoteChainId, bobAddressBytes32, initialAmount, false, defaultAdapterParams)).nativeFee
         await localOFT
             .connect(alice)
             .sendFrom(
-                alice.address,
+                aliceAddress,
                 remoteChainId,
                 bobAddressBytes32,
                 initialAmount,
-                [alice.address, ethers.constants.AddressZero, defaultAdapterParams],
+                [aliceAddress, ZeroAddress, defaultAdapterParams] as any,
                 { value: nativeFee }
             )
 
         // tokens are now owned by the proxy contract, because this is the original oft chain
-        expect(await erc20.balanceOf(localOFT.address)).to.equal(amount)
-        expect(await erc20.balanceOf(alice.address)).to.equal(dust)
+        expect(await erc20.balanceOf(localOFTAddress)).to.equal(amount)
+        expect(await erc20.balanceOf(aliceAddress)).to.equal(dust)
 
         // tokens received on the remote chain
         expect(await remoteOFT.totalSupply()).to.equal(amount)
-        expect(await remoteOFT.balanceOf(bob.address)).to.be.equal(amount)
+        expect(await remoteOFT.balanceOf(bobAddress)).to.be.equal(amount)
 
         // bob send tokens back to alice from remote chain
-        const aliceAddressBytes32 = ethers.utils.defaultAbiCoder.encode(["address"], [alice.address])
-        const halfAmount = amount.div(2)
+        const aliceAddressBytes32 = abiCoder.encode(["address"], [aliceAddress])
+        const halfAmount = amount / 2n
         nativeFee = (await remoteOFT.estimateSendFee(localChainId, aliceAddressBytes32, halfAmount, false, defaultAdapterParams)).nativeFee
         await remoteOFT
             .connect(bob)
             .sendFrom(
-                bob.address,
+                bobAddress,
                 localChainId,
                 aliceAddressBytes32,
                 halfAmount,
-                [bob.address, ethers.constants.AddressZero, defaultAdapterParams],
+                [bobAddress, ZeroAddress, defaultAdapterParams] as any,
                 { value: nativeFee }
             )
 
         // half tokens are burned on the remote chain
         expect(await remoteOFT.totalSupply()).to.equal(halfAmount)
-        expect(await remoteOFT.balanceOf(bob.address)).to.be.equal(halfAmount)
+        expect(await remoteOFT.balanceOf(bobAddress)).to.be.equal(halfAmount)
 
         // tokens received on the local chain and unlocked from the proxy
-        expect(await erc20.balanceOf(localOFT.address)).to.be.equal(halfAmount)
+        expect(await erc20.balanceOf(localOFTAddress)).to.be.equal(halfAmount)
         // console.log(halfAmount, dust, typeof halfAmount, typeof dust)
         // console.log(halfAmount.add(dust), typeof halfAmount.add(dust))
-        expect(await erc20.balanceOf(alice.address)).to.be.equal(halfAmount.add(dust))
+        expect(await erc20.balanceOf(aliceAddress)).to.be.equal(halfAmount + dust)
     })
 
     it("total outbound amount overflow", async function () {
         // alice try sending a huge amount of tokens to bob on remote chain
-        await erc20.mint(alice.address, ethers.constants.MaxUint256)
+        await erc20.mint(aliceAddress, MaxUint256)
 
-        const maxUint64 = BigNumber.from(2).pow(64).sub(1)
-        let amount = maxUint64.mul(BigNumber.from(10).pow(18 - sharedDecimals)) // sd to ld
+        const maxUint64 = 2n ** 64n - 1n // BigNumber.from(2).pow(64).sub(1)
+        let amount = maxUint64 * (10n ** (18n - BigInt(sharedDecimals))) //.mul(BigNumber.from(10).pow(18 - sharedDecimals)) // sd to ld
 
         // swaps max amount of token to remote chain
-        await erc20.connect(alice).approve(localOFT.address, ethers.constants.MaxUint256)
-        const bobAddressBytes32 = ethers.utils.defaultAbiCoder.encode(["address"], [bob.address])
+        await erc20.connect(alice).approve(localOFTAddress, MaxUint256)
+        const bobAddressBytes32 = abiCoder.encode(["address"], [bobAddress])
         let nativeFee = (await localOFT.estimateSendFee(remoteChainId, bobAddressBytes32, amount, false, defaultAdapterParams)).nativeFee
         await localOFT
             .connect(alice)
             .sendFrom(
-                alice.address,
+                aliceAddress,
                 remoteChainId,
                 bobAddressBytes32,
                 amount,
-                [alice.address, ethers.constants.AddressZero, defaultAdapterParams],
+                [aliceAddress, ZeroAddress, defaultAdapterParams] as any,
                 { value: nativeFee }
             )
 
-        amount = BigNumber.from(10).pow(18 - sharedDecimals) // min amount without dust
+        amount = 10n ** (18n - BigInt(sharedDecimals)) // min amount without dust
 
         // fails to send more for cap overflow
         nativeFee = (await localOFT.estimateSendFee(remoteChainId, bobAddressBytes32, amount, false, defaultAdapterParams)).nativeFee
@@ -145,15 +167,15 @@ describe("OFT v2: ", function () {
             await localOFT
                 .connect(alice)
                 .sendFrom(
-                    alice.address,
+                    aliceAddress,
                     remoteChainId,
                     bobAddressBytes32,
                     amount,
-                    [alice.address, ethers.constants.AddressZero, defaultAdapterParams],
+                    [aliceAddress, ZeroAddress, defaultAdapterParams] as any,
                     { value: nativeFee }
                 )
             expect(false).to.be.true
-        } catch (e) {
+        } catch (e: any) {
             expect(e.message).to.match(/ProxyOFT: outboundAmount overflow/)
         }
     })
