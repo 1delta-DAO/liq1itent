@@ -1,1 +1,1 @@
-# liq1itent - frotnend
+# liq1itent - solver

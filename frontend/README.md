@@ -1,1 +1,1 @@
-# liq1itent - solver implementation
+# liq1itent - frontend
