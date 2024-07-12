@@ -80,15 +80,23 @@ contract Settlement is Initializable, NonblockingLzApp {
     }
 
     function settle(
-        bytes32 receiver,
+        bytes32 originAmountReceiver,
         OrderLib.CrossChainOrder calldata order,
-        bytes memory adapterParams
+        bytes calldata adapterParams
     ) external payable {
         uint16 _dstChainId = uint16(order.destinationChainId);
         bytes memory trustedRemote = trustedRemoteLookup[_dstChainId];
         require(
             trustedRemote.length != 0,
             "LzApp: destination chain is not a trusted source"
+        );
+
+        // Fill the order by transferring funds from the caller to the
+        // receiver
+        IERC20(order.destinationToken.toEvmAddress()).safeTransferFrom(
+            msg.sender,
+            order.destinationReceiver.toEvmAddress(),
+            order.destinationAmount
         );
 
         bytes32 orderHash = OrderLib.getHash(order);
@@ -98,7 +106,7 @@ contract Settlement is Initializable, NonblockingLzApp {
         // partial fills
         bytes memory payload = abi.encodePacked(
             orderHash,
-            receiver,
+            originAmountReceiver,
             uint256(0)
         );
         // transmit the message

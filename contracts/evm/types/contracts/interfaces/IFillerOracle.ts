@@ -29,6 +29,7 @@ export declare namespace OrderLib {
     initiateDeadline: BigNumberish;
     fillDeadline: BigNumberish;
     destinationChainId: BigNumberish;
+    destinationReceiver: BytesLike;
     destinationSettlementContract: BytesLike;
     originToken: BytesLike;
     originAmount: BigNumberish;
@@ -44,6 +45,7 @@ export declare namespace OrderLib {
     initiateDeadline: bigint,
     fillDeadline: bigint,
     destinationChainId: bigint,
+    destinationReceiver: string,
     destinationSettlementContract: string,
     originToken: string,
     originAmount: bigint,
@@ -57,6 +59,7 @@ export declare namespace OrderLib {
     initiateDeadline: bigint;
     fillDeadline: bigint;
     destinationChainId: bigint;
+    destinationReceiver: string;
     destinationSettlementContract: string;
     originToken: string;
     originAmount: bigint;

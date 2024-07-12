@@ -32,6 +32,7 @@ export declare namespace OrderLib {
     initiateDeadline: BigNumberish;
     fillDeadline: BigNumberish;
     destinationChainId: BigNumberish;
+    destinationReceiver: BytesLike;
     destinationSettlementContract: BytesLike;
     originToken: BytesLike;
     originAmount: BigNumberish;
@@ -47,6 +48,7 @@ export declare namespace OrderLib {
     initiateDeadline: bigint,
     fillDeadline: bigint,
     destinationChainId: bigint,
+    destinationReceiver: string,
     destinationSettlementContract: string,
     originToken: string,
     originAmount: bigint,
@@ -60,6 +62,7 @@ export declare namespace OrderLib {
     initiateDeadline: bigint;
     fillDeadline: bigint;
     destinationChainId: bigint;
+    destinationReceiver: string;
     destinationSettlementContract: string;
     originToken: string;
     originAmount: bigint;
@@ -745,7 +748,7 @@ export interface Settlement extends BaseContract {
 
   settle: TypedContractMethod<
     [
-      receiver: BytesLike,
+      originAmountReceiver: BytesLike,
       order: OrderLib.CrossChainOrderStruct,
       adapterParams: BytesLike
     ],
@@ -954,7 +957,7 @@ export interface Settlement extends BaseContract {
     nameOrSignature: "settle"
   ): TypedContractMethod<
     [
-      receiver: BytesLike,
+      originAmountReceiver: BytesLike,
       order: OrderLib.CrossChainOrderStruct,
       adapterParams: BytesLike
     ],

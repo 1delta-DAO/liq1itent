@@ -24,7 +24,9 @@ library OrderLib {
         uint32 fillDeadline;
         /** CUSTOM BYTES */
         ///@dev dest chainId
-        uint32 destinationChainId;
+        uint32 destinationChainId;        
+        ///@dev dest address
+        bytes32 destinationReceiver;
         ///@dev dest settlement contract
         bytes32 destinationSettlementContract;
         ///@dev origin token to be pulled from user
@@ -97,6 +99,7 @@ library OrderLib {
                     order.initiateDeadline,
                     order.fillDeadline,
                     order.destinationChainId,
+                    order.destinationReceiver,
                     order.destinationSettlementContract,
                     order.originToken,
                     order.originAmount,

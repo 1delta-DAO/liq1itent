@@ -50,6 +50,11 @@ const _abi = [
           },
           {
             internalType: "bytes32",
+            name: "destinationReceiver",
+            type: "bytes32",
+          },
+          {
+            internalType: "bytes32",
             name: "destinationSettlementContract",
             type: "bytes32",
           },
