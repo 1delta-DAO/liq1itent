@@ -3,16 +3,6 @@
 library OrderSig {
     error BadSignature(bytes32 hash);
 
-    /// @dev Encoded EC signature.
-    struct OrderSignature {
-        // EC Signature data.
-        uint8 v;
-        // EC Signature data.
-        bytes32 r;
-        // EC Signature data.
-        bytes32 s;
-    }
-
     // '\x19Ethereum Signed Message:\n32\x00\x00\x00\x00' in a word.
     uint256 private constant ETH_SIGN_HASH_PREFIX =
         0x19457468657265756d205369676e6564204d6573736167653a0a333200000000;

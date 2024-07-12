@@ -60,7 +60,7 @@ contract Settlement is Initializable, NonblockingLzApp {
         );
     }
 
-    function intitalize(
+    function inititalize(
         address fillerOracle,
         address refundAddress
     ) public initializer {

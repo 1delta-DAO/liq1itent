@@ -137,7 +137,7 @@ export interface SettlementInterface extends Interface {
       | "getConfig"
       | "getTrustedRemoteAddress"
       | "initiate"
-      | "intitalize"
+      | "inititalize"
       | "isTrustedRemote"
       | "lzEndpoint"
       | "lzReceive"
@@ -207,7 +207,7 @@ export interface SettlementInterface extends Interface {
     values: [OrderLib.CrossChainOrderStruct, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "intitalize",
+    functionFragment: "inititalize",
     values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
@@ -319,7 +319,10 @@ export interface SettlementInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initiate", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "intitalize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "inititalize",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "isTrustedRemote",
     data: BytesLike
@@ -618,7 +621,7 @@ export interface Settlement extends BaseContract {
     "nonpayable"
   >;
 
-  intitalize: TypedContractMethod<
+  inititalize: TypedContractMethod<
     [fillerOracle: AddressLike, refundAddress: AddressLike],
     [void],
     "nonpayable"
@@ -822,7 +825,7 @@ export interface Settlement extends BaseContract {
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "intitalize"
+    nameOrSignature: "inititalize"
   ): TypedContractMethod<
     [fillerOracle: AddressLike, refundAddress: AddressLike],
     [void],
