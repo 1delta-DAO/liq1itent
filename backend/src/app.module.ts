@@ -6,6 +6,7 @@ import { TypeOrmConfigService } from "./config/typeorm.config";
 import { HttpModule } from "@nestjs/axios";
 import { HttpConfigService } from "./config/http.config";
 import { OrderModule } from "./module/order/order.module";
+import { SolverModule } from "./module/solver/solver.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { OrderModule } from "./module/order/order.module";
       useClass: HttpConfigService,
     }),
     OrderModule,
+    SolverModule,
   ],
 })
 export class AppModule {}
