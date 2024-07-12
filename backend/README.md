@@ -10,6 +10,9 @@ docker compose up
 yarn
 ```
 
+## ENV
+- Copy `.env.example` to `.env`
+
 ## Run
 ```ts
 yarn start
