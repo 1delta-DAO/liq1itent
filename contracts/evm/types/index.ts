@@ -14,6 +14,8 @@ export type { IERC20Errors } from "./@openzeppelin/contracts/interfaces/draft-IE
 export { IERC20Errors__factory } from "./factories/@openzeppelin/contracts/interfaces/draft-IERC6093.sol/IERC20Errors__factory";
 export type { IERC721Errors } from "./@openzeppelin/contracts/interfaces/draft-IERC6093.sol/IERC721Errors";
 export { IERC721Errors__factory } from "./factories/@openzeppelin/contracts/interfaces/draft-IERC6093.sol/IERC721Errors__factory";
+export type { Initializable } from "./@openzeppelin/contracts/proxy/utils/Initializable";
+export { Initializable__factory } from "./factories/@openzeppelin/contracts/proxy/utils/Initializable__factory";
 export type { ERC20 } from "./@openzeppelin/contracts/token/ERC20/ERC20";
 export { ERC20__factory } from "./factories/@openzeppelin/contracts/token/ERC20/ERC20__factory";
 export type { IERC20Metadata } from "./@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata";
@@ -32,6 +34,10 @@ export type { IERC165 } from "./@openzeppelin/contracts/utils/introspection/IERC
 export { IERC165__factory } from "./factories/@openzeppelin/contracts/utils/introspection/IERC165__factory";
 export type { ReentrancyGuard } from "./@openzeppelin/contracts/utils/ReentrancyGuard";
 export { ReentrancyGuard__factory } from "./factories/@openzeppelin/contracts/utils/ReentrancyGuard__factory";
+export type { FillerOracle } from "./contracts/FillerOracle";
+export { FillerOracle__factory } from "./factories/contracts/FillerOracle__factory";
+export type { IFillerOracle } from "./contracts/interfaces/IFillerOracle";
+export { IFillerOracle__factory } from "./factories/contracts/interfaces/IFillerOracle__factory";
 export type { OrderSig } from "./contracts/libraries/OrderSig";
 export { OrderSig__factory } from "./factories/contracts/libraries/OrderSig__factory";
 export type { ILayerZeroEndpoint } from "./contracts/lzApp/interfaces/ILayerZeroEndpoint";
@@ -80,3 +86,5 @@ export type { OFTV2 } from "./contracts/oft/OFTV2";
 export { OFTV2__factory } from "./factories/contracts/oft/OFTV2__factory";
 export type { ProxyOFTV2 } from "./contracts/oft/ProxyOFTV2";
 export { ProxyOFTV2__factory } from "./factories/contracts/oft/ProxyOFTV2__factory";
+export type { Settlement } from "./contracts/Settlement";
+export { Settlement__factory } from "./factories/contracts/Settlement__factory";

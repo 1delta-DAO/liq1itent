@@ -27,6 +27,24 @@ library OrderSig {
     uint256 private constant ECDSA_SIGNATURE_S_LIMIT =
         ECDSA_SIGNATURE_R_LIMIT / 2 + 1;
 
+    uint256 internal constant UINT8_MASK = 0xff;
+
+    function decodeSig(
+        bytes calldata signature
+    ) internal pure returns (uint8 v, bytes32 r, bytes32 s) {
+        assembly {
+            v := and(UINT8_MASK, shr(248, calldataload(signature.offset)))
+            r := and(
+                UINT8_MASK,
+                shr(248, calldataload(add(1, signature.offset)))
+            )
+            s := and(
+                UINT8_MASK,
+                shr(248, calldataload(add(33, signature.offset)))
+            )
+        }
+    }
+
     /// @dev Retrieve the signer of a signature.
     ///      Throws if the signature can't be validated.
     /// @param orderHash The hash that was signed.
@@ -34,11 +52,12 @@ library OrderSig {
     /// @return recovered The recovered signer address.
     function getSignerOfHash(
         bytes32 orderHash,
-        OrderSignature calldata signature
+        bytes calldata signature
     ) internal pure returns (address recovered) {
+        (uint8 v, bytes32 r, bytes32 s) = decodeSig(signature);
         /// @notice we use `ecrecover`, there are vulnerabilities, but for the sake of the
         /// hackathon we acknowledge that this could be written in a better manner
-        recovered = ecrecover(orderHash, signature.v, signature.r, signature.s);
+        recovered = ecrecover(orderHash, v, r, s);
 
         // `recovered` can be null if the signature values are out of range.
         if (recovered == address(0)) revert BadSignature(orderHash);

@@ -30,6 +30,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721Errors__factory>;
     getContractFactory(
+      name: "Initializable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Initializable__factory>;
+    getContractFactory(
       name: "ERC20",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC20__factory>;
@@ -65,6 +69,14 @@ declare module "hardhat/types/runtime" {
       name: "ReentrancyGuard",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReentrancyGuard__factory>;
+    getContractFactory(
+      name: "FillerOracle",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FillerOracle__factory>;
+    getContractFactory(
+      name: "IFillerOracle",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IFillerOracle__factory>;
     getContractFactory(
       name: "OrderSig",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -161,6 +173,10 @@ declare module "hardhat/types/runtime" {
       name: "ProxyOFTV2",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ProxyOFTV2__factory>;
+    getContractFactory(
+      name: "Settlement",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Settlement__factory>;
 
     getContractAt(
       name: "Ownable",
@@ -182,6 +198,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC721Errors>;
+    getContractAt(
+      name: "Initializable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Initializable>;
     getContractAt(
       name: "ERC20",
       address: string | ethers.Addressable,
@@ -227,6 +248,16 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ReentrancyGuard>;
+    getContractAt(
+      name: "FillerOracle",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FillerOracle>;
+    getContractAt(
+      name: "IFillerOracle",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IFillerOracle>;
     getContractAt(
       name: "OrderSig",
       address: string | ethers.Addressable,
@@ -347,6 +378,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ProxyOFTV2>;
+    getContractAt(
+      name: "Settlement",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Settlement>;
 
     deployContract(
       name: "Ownable",
@@ -364,6 +400,10 @@ declare module "hardhat/types/runtime" {
       name: "IERC721Errors",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC721Errors>;
+    deployContract(
+      name: "Initializable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Initializable>;
     deployContract(
       name: "ERC20",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -400,6 +440,14 @@ declare module "hardhat/types/runtime" {
       name: "ReentrancyGuard",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
+    deployContract(
+      name: "FillerOracle",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FillerOracle>;
+    deployContract(
+      name: "IFillerOracle",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IFillerOracle>;
     deployContract(
       name: "OrderSig",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -496,6 +544,10 @@ declare module "hardhat/types/runtime" {
       name: "ProxyOFTV2",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ProxyOFTV2>;
+    deployContract(
+      name: "Settlement",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Settlement>;
 
     deployContract(
       name: "Ownable",
@@ -517,6 +569,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC721Errors>;
+    deployContract(
+      name: "Initializable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Initializable>;
     deployContract(
       name: "ERC20",
       args: any[],
@@ -562,6 +619,16 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
+    deployContract(
+      name: "FillerOracle",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FillerOracle>;
+    deployContract(
+      name: "IFillerOracle",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IFillerOracle>;
     deployContract(
       name: "OrderSig",
       args: any[],
@@ -682,6 +749,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ProxyOFTV2>;
+    deployContract(
+      name: "Settlement",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Settlement>;
 
     // default types
     getContractFactory(
