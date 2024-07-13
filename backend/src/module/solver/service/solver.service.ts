@@ -18,11 +18,20 @@ export class SolverService {
       console.log(order);
       const rpc = await findWorkingRpc(order.originChainId);
       const settlement = getSettlementContract(order.originChainId, rpc);
-      // await settlement.initiate(
-      //   this.orderToPayload(order),
-      //   order.signature,
-      //   ""
-      // );
+      if (!settlement) {
+        console.log(
+          "No settlement contract found for chainId",
+          order.originChainId
+        );
+        continue;
+      }
+      const res = await settlement.initiate(
+        this.orderToPayload(order),
+        order.signature,
+        ""
+      );
+
+      console.log(res);
     }
   }
 
