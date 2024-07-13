@@ -21,10 +21,10 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
 import { parseUnits } from "@ethersproject/units";
 import { ethers } from "ethers";
+import { ArrowDownCircle } from "react-feather";
 
 import {
   ALL_COINS,
-  SUPPORTED_STABLES_DOLLAR,
 } from "../../config/coins.config";
 
 export const TradeComponent: React.FC = () => {
@@ -39,7 +39,7 @@ export const TradeComponent: React.FC = () => {
 
   const tokens = useMemo(
     () =>
-      SUPPORTED_STABLES_DOLLAR.map((token, index) => ({
+      ALL_COINS.map((token, index) => ({
         icon: token.icon,
         key: index,
         label: token.name,
@@ -104,8 +104,9 @@ export const TradeComponent: React.FC = () => {
 
   }
 
-  const onTypeInput = () => { }
-
+  function onTypeInput(e:any) {
+    setInput(e.target.value);
+}
   const renderButton = (): React.ReactNode => {
     if (parseUnits(input, selectedCoinMemo?.decimals).gte(amountApproved)) {
       return (
@@ -131,14 +132,7 @@ export const TradeComponent: React.FC = () => {
   return (
     <div className={styles["trade"]}>
       <div className={styles["panel"]}>
-        <div className={styles["buysell"]}>
-          <div className={styles["buy"]}>Buy/Long</div>
-          <div className={styles["sell"]}>Sell/Short</div>
-        </div>
         <div className={styles["collateral-balance"]}>
-          <div className={styles["collateral-amount"]}>
-            Pay: ${(Number(input) * 0.9998).toLocaleString()}
-          </div>
           <div className={styles["balance"]}>Balance: {balance}</div>
         </div>
         <div className={styles["collateral"]}>
@@ -186,7 +180,9 @@ export const TradeComponent: React.FC = () => {
             />
           </div>
         </div>
-
+        <div style={{ display: "flex", alignItems: 'center', justifyContent: "center", padding: "5px" }}>
+          <ArrowDownCircle />
+        </div>
         <div className={styles["long"]}>
           <input
             type="string"
@@ -194,7 +190,7 @@ export const TradeComponent: React.FC = () => {
             className={styles["long-left"]}
             disabled={false}
           />
-          <div className={styles["collateral-right"]}>
+          <div className={styles["collateral-right"]} style={{ zIndex: 0 }}>
             <SelectComponent
               options={tokens}
               onOptionChange={onTokenOutChange}
