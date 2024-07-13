@@ -1,7 +1,6 @@
 /* eslint-disable */
 import React from "react";
 import { HeaderComponent } from "../header/Header.component";
-import styles from "./swap.module.scss";
 
 import { useEffect, useState } from "react";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
@@ -248,9 +247,7 @@ export const AppComponent = (): JSX.Element => {
   return (
     <main>
       <HeaderComponent title="Liqu1tent" subTitle="by 1delta" login={login} logout={logout} loggedIn={loggedIn} />
-      <div className={styles["swap"]}>
-        <TradeComponent getWeb3Provider={getWeb3Provider} />
-      </div>
+      <TradeComponent getWeb3Provider={getWeb3Provider} />
     </main>
   );
 };
