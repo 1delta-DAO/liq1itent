@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: MIT
 
+pragma solidity ^0.8.25;
+
+
 library OrderSig {
     error BadSignature(bytes32 hash);
 
@@ -24,14 +27,8 @@ library OrderSig {
     ) internal pure returns (uint8 v, bytes32 r, bytes32 s) {
         assembly {
             v := and(UINT8_MASK, shr(248, calldataload(signature.offset)))
-            r := and(
-                UINT8_MASK,
-                shr(248, calldataload(add(1, signature.offset)))
-            )
-            s := and(
-                UINT8_MASK,
-                shr(248, calldataload(add(33, signature.offset)))
-            )
+            r := calldataload(add(1, signature.offset))
+            s := calldataload(add(33, signature.offset))
         }
     }
 
@@ -47,8 +44,18 @@ library OrderSig {
         (uint8 v, bytes32 r, bytes32 s) = decodeSig(signature);
         /// @notice we use `ecrecover`, there are vulnerabilities, but for the sake of the
         /// hackathon we acknowledge that this could be written in a better manner
-        recovered = ecrecover(orderHash, v, r, s);
 
+        // Signed using `eth_sign`
+        // Need to hash `hash` with "\x19Ethereum Signed Message:\n32" prefix
+        // in packed encoding.
+        bytes32 ethSignHash;
+        assembly {
+            // Use scratch space
+            mstore(0, ETH_SIGN_HASH_PREFIX) // length of 28 bytes
+            mstore(28, orderHash) // length of 32 bytes
+            ethSignHash := keccak256(0, 60)
+        }
+        recovered = ecrecover(ethSignHash, v, r, s);
         // `recovered` can be null if the signature values are out of range.
         if (recovered == address(0)) revert BadSignature(orderHash);
     }

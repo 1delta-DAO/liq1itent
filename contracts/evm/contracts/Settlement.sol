@@ -9,6 +9,7 @@ import {NonblockingLzApp} from "./lzApp/NonblockingLzApp.sol";
 import {IFillerOracle} from "./interfaces/IFillerOracle.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "hardhat/console.sol";
 
 contract Settlement is Initializable, NonblockingLzApp {
     using AddressLib for bytes32;
@@ -124,7 +125,7 @@ contract Settlement is Initializable, NonblockingLzApp {
         bytes32 orderHash,
         bytes32 swapper,
         bytes calldata signature
-    ) public {
+    ) public view {
         if (
             swapper.toEvmAddress() !=
             OrderSig.getSignerOfHash(orderHash, signature)

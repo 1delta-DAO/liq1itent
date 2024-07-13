@@ -809,7 +809,7 @@ export interface MockSettlement extends BaseContract {
   verifySignature: TypedContractMethod<
     [orderHash: BytesLike, swapper: BytesLike, signature: BytesLike],
     [void],
-    "nonpayable"
+    "view"
   >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
@@ -1025,7 +1025,7 @@ export interface MockSettlement extends BaseContract {
   ): TypedContractMethod<
     [orderHash: BytesLike, swapper: BytesLike, signature: BytesLike],
     [void],
-    "nonpayable"
+    "view"
   >;
 
   getEvent(

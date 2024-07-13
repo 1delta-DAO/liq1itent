@@ -61,6 +61,8 @@ describe("EvmOrder: ", function () {
 
         localSettlement = await new MockSettlement__factory(owner).deploy(localEndpoint)
         remoteSettlement = await new MockSettlement__factory(owner).deploy(remoteEndpoint)
+        await localSettlement.mockSetChainId(localChainId)
+        await remoteSettlement.mockSetChainId(remoteChainId)
         localSettlementAddress = await localSettlement.getAddress()
         remoteSettlementAddress = await remoteSettlement.getAddress()
 
@@ -100,16 +102,12 @@ describe("EvmOrder: ", function () {
             swapper: padAddress(swapperAddress),
             originChainId: localChainId
         })
-        console.log("TH", await localSettlement.getOrderTypeHash())
         const hash = getHash(order)
-        console.log("hash", hash)
         const vrsSig = await ethSignHashWithProviderAsync(hash, swapper)
-        console.log("vrs", vrsSig)
         const packedSig = solidityPacked(
             ['uint8', 'bytes32', 'bytes32'],
             [vrsSig.v, vrsSig.r, vrsSig.s]
         )
-        console.log("test")
         await localSettlement.verifySignature(
             hash,
             order.swapper,
@@ -118,7 +116,26 @@ describe("EvmOrder: ", function () {
     })
 
     it("verify malicous order signature fails", async function () {
-
+        const order: CrossChainOrder = getOrder({
+            swapper: padAddress(swapperAddress),
+            originChainId: localChainId
+        })
+        const hash = getHash(order)
+        const vrsSig = await ethSignHashWithProviderAsync(hash, swapper)
+        const packedSig = solidityPacked(
+            ['uint8', 'bytes32', 'bytes32'],
+            [vrsSig.v, vrsSig.r, vrsSig.s]
+        )
+        try {
+            // amend something in the order
+            const falseHash = getHash({ ...order, originChainId: 99 })
+            await localSettlement.verifySignature(
+                falseHash,
+                order.swapper,
+                packedSig
+            )
+            expect(true).to.equals(false, "did not revert")
+        } catch (e: any) { }
     })
 
     it("fill x-chain order converntionally", async function () {
