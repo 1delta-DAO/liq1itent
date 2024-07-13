@@ -1,0 +1,64 @@
+@import "../../../../../public/assets/styles/_variables/colors";
+@import "../../../../../public/assets/styles/_variables/breakpoints";
+@import "../../../../../public/assets/styles/_variables/_sizes";
+
+.connect {
+  padding: 0;
+
+  button {
+    margin: 0 0.6rem;
+    padding: 0rem 2.4rem;
+    color: $main-darkest;
+    background-color: $white;
+    letter-spacing: 1;
+    line-height: 4.8rem;
+    text-transform: uppercase;
+
+    &:hover {
+      color: $white;
+      background: $main-darko;
+      box-shadow: 0 0 8px 8px transparentize($saffron, 0.8);
+      border: solid 0.1rem transparentize($mustard, 0.2);
+      transition: all 0.4s ease-in;
+    }
+  }
+}
+
+@media all and (max-width: $mobile-large) {
+  .connect {
+    margin-left: auto;
+    button {
+      background: transparent;
+      border: 1px solid $white;
+      color: $white;
+    }
+  }
+}
+
+@media all and (max-width: $mobile-medium) {
+  .connect {
+    margin-left: auto;
+    button {
+      background: transparent;
+      border: 1px solid $white;
+      color: $white;
+      font-size: 2.2vw;
+      padding: 2vw 2.5vw;
+      height: 5.2vw;
+    }
+  }
+}
+
+@media all and (max-width: $mobile-small) {
+  .connect {
+    margin-left: auto;
+    button {
+      background: transparent;
+      border: 1px solid $white;
+      color: $white;
+      font-size: 2.2vw;
+      padding: 2vw 2vw;
+      height: 5.5vw;
+    }
+  }
+}

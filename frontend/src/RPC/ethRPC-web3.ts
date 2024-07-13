@@ -43,10 +43,10 @@ export default class EthereumRPC implements IRPC{
       const address = (await web3.eth.getAccounts())[0]
 
       // Get user's balance in ether
-      const balance = web3.utils.fromWei(
+      const balance = address ? web3.utils.fromWei(
         await web3.eth.getBalance(address), // Balance is in wei
         'ether', // Convert wei to ether
-      )
+      ) : "0"
 
       return balance
     } catch (error) {
@@ -93,11 +93,11 @@ export default class EthereumRPC implements IRPC{
       const originalMessage = 'YOUR_MESSAGE'
 
       // Sign the message
-      const signedMessage = await web3.eth.personal.sign(
+      const signedMessage = fromAddress ? await web3.eth.personal.sign(
         originalMessage,
         fromAddress,
         'test password!', // configure your own password here.
-      )
+      ) : ""
 
       return signedMessage
     } catch (error) {

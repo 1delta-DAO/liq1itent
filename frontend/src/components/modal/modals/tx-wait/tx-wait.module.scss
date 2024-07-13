@@ -1,0 +1,37 @@
+@import "../../../../../public/assets/styles/_variables/breakpoints";
+@import "../../../../../public/assets/styles/_variables/colors";
+@import "../../../../../public/assets/styles/_variables/_sizes";
+
+.tx-wait-modal {
+  width: 600px;
+  padding: 0rem 4.2rem 0.8rem 4.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  @media all and (max-width: $mobile-small) {
+    width: 100%;
+  }
+
+  p {
+    color: $soap;
+    width: 90%;
+    font-size: $card-text-font-size;
+    margin-bottom: $tab;
+
+    @media all and (max-width: $mobile-large) {
+      font-size: $card-text-font-size-mobile-large;
+      margin-bottom: $tab-mobile-large;
+    }
+
+    @media all and (max-width: $mobile-small) {
+      font-size: $card-text-font-size-mobile-small;
+      margin-bottom: $tab-mobile-small;
+    }
+
+    &:not(:first-child) {
+      margin-top: 4rem;
+    }
+  }
+}

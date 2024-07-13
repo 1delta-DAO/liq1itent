@@ -1,0 +1,201 @@
+@import "../../../public/assets/styles/_variables/colors";
+
+.trade {
+  width: 25%;
+  .panel {
+    width: 100%;
+    height: 600px;
+    color: #d1d4dc;
+    background-color: #131722;
+    border: 0.1px solid transparentize(#d9dadb, 0.75);
+    font-size: 1.2rem;
+    .buysell {
+      display: flex;
+      flex-direction: row;
+      height: 40px;
+      font-size: 1.6rem;
+      .buy {
+        text-align: center;
+        padding: 8px;
+        width: 50%;
+        border: 0.1px solid transparentize(#d9dadb, 0.75);
+        // border-bottom: 2px solid transparentize(#d9dadb, 0.75); // TODO: remove line below and comment this in
+        border-bottom: 2px solid transparentize(#00bc06, 0.5);
+        &:hover {
+          cursor: pointer;
+          border: 0.1px solid transparentize(#d9dadb, 0.5);
+          border-bottom: 2px solid transparentize(#00bc06, 0.5);
+        }
+        .active {
+          border-bottom: 2px solid transparentize(#00bc06, 0.5);
+        }
+      }
+      .sell {
+        text-align: center;
+        padding: 8px;
+        width: 50%;
+        border: 0.1px solid transparentize(#d9dadb, 0.75);
+        border-bottom: 2px solid transparentize(#d9dadb, 0.75);
+        &:hover {
+          cursor: pointer;
+          border: 0.1px solid transparentize(#d9dadb, 0.5);
+          border-bottom: 2px solid transparentize(#d10000, 0.5);
+        }
+        .active {
+          border-bottom: 2px solid transparentize(#d10000, 0.5);
+        }
+      }
+    }
+    .collateral-balance {
+      display: flex;
+      flex-direction: row;
+      padding: 8px;
+      .collateral-amount {
+        text-align: left;
+        padding: 8px;
+        width: 50%;
+        border: 0;
+      }
+      .balance {
+        text-align: right;
+        padding: 8px;
+        width: 50%;
+        border: 0;
+      }
+    }
+    .collateral {
+      display: flex;
+      flex-direction: row;
+      background-color: #000;
+      margin-left: 8px;
+      margin-right: 8px;
+      border-radius: 8px;
+      padding: 8px;
+      .collateral-left {
+        display: flex;
+        flex-direction: row;
+        width: 60%;
+        input {
+          background-color: transparent;
+          outline: 0;
+          border: 0;
+          color: #fff;
+          padding: 4px;
+          width: calc(100% - 40px);
+        }
+        .max {
+          width: 40px;
+          background-color: #2a2b2e;
+          border-radius: 8px;
+          text-align: center;
+          vertical-align: middle;
+          padding: 6px 8px;
+          border: 0;
+          margin-right: 20px;
+          font-size: 1.1rem;
+          &:hover {
+            cursor: pointer;
+            color: #00bc06;
+          }
+        }
+      }
+      .collateral-right {
+        display: flex;
+        flex-direction: row;
+        width: 40%;
+        justify-content: flex-end;
+      }
+    }
+    .long-label {
+      padding: 8px 16px;
+      margin-top: 16px;
+    }
+    .long {
+      display: flex;
+      flex-direction: row;
+      background-color: #000;
+      margin-left: 8px;
+      margin-right: 8px;
+      border-radius: 8px;
+      padding: 8px;
+      input {
+        background-color: transparent;
+        border: solid 0.1rem transparent;
+        outline: 0;
+        border: 0;
+        color: #fff;
+        padding: 4px;
+        width: calc(100% - 40px);
+      }
+      .max {
+        width: 40px;
+        background-color: #2a2b2e;
+        border-radius: 8px;
+        text-align: center;
+        vertical-align: middle;
+        padding: 6px 8px;
+        border: 0;
+        margin-right: 20px;
+        font-size: 1.1rem;
+        &:hover {
+          cursor: pointer;
+          color: #00bc06;
+        }
+      }
+      .long-right {
+        display: flex;
+        flex-direction: row;
+        width: 20%;
+        justify-content: flex-end;
+      }
+    }
+    .leverage-label {
+      padding: 8px 16px;
+      margin-top: 16px;
+    }
+    .leverage {
+      display: flex;
+      flex-direction: row;
+      .leverage-input {
+        background-color: #000;
+        margin-left: 8px;
+        margin-right: 8px;
+        border-radius: 8px;
+        padding: 8px;
+        width: 48px;
+        input {
+          background-color: #000;
+          outline: 0;
+          border: 0;
+          color: #fff;
+          padding: 4px;
+          width: 100%;
+        }
+      }
+      .leverage-slider {
+        display: flex;
+        align-items: center;
+        width: calc(100% - 72px);
+      }
+    }
+    .action {
+      text-align: center;
+      margin-top: 24px;
+      background: $gradient-button;
+      margin-left: 8px;
+      margin-right: 8px;
+      border-radius: 16px;
+      padding: 24px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      &:hover {
+        background: $gradient-button-hover;
+      }
+    }
+  }
+  .bottom-right {
+    height: 500px;
+    color: #d1d4dc;
+    background-color: #131722;
+  }
+}

@@ -1,0 +1,16 @@
+@import "../../../public/assets/styles/_variables/colors";
+@import "../../../public/assets/styles/_variables/breakpoints";
+@import "../../../public/assets/styles/_variables/_sizes";
+
+.section-wrapper {
+  position: relative;
+  margin-bottom: $tab-double;
+
+  @media all and (max-width: $mobile-large) {
+    margin-bottom: $tab-double-mobile-large;
+  }
+
+  @media all and (max-width: $mobile-small) {
+    margin-bottom: $tab-double-mobile-small;
+  }
+}

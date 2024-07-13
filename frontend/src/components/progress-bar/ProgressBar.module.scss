@@ -1,0 +1,149 @@
+@import "../../../public/assets/styles/_variables/colors";
+@import "../../../public/assets/styles/_variables/breakpoints";
+@import "../../../public/assets/styles/_variables/_sizes";
+
+$bar-height: 0.4rem;
+
+.progress-bar-wrapper {
+  margin-bottom: $tab;
+  position: relative;
+
+  .progress-bar {
+    background-color: transparentize($gold, 0.8);
+    border-radius: 3.2rem;
+    height: $bar-height;
+    width: 100%;
+
+    .progress {
+      border-radius: 0.9rem;
+      height: 100%;
+      transition: width 1s ease-in-out;
+      position: relative;
+
+      .progres-icon {
+        border-radius: 50%;
+        background: transparent !important;
+        box-shadow: 0 0 5.2rem $gold;
+        content: "";
+        display: flex;
+        left: 97.5%;
+        position: absolute;
+        width: 2.8rem;
+        height: 2.8rem;
+
+        & > span {
+          height: 2.8rem;
+          width: 2.8rem;
+        }
+
+        &.no-icon {
+          top: -0.6rem;
+          width: 1.6rem;
+          height: 1.6rem;
+          & > span {
+            background-color: $gold;
+            border-radius: 100%;
+            height: 1.6rem;
+            top: -0.6rem;
+            width: 1.6rem;
+            box-shadow: 0 0 2.4rem $gold;
+          }
+        }
+
+        &.icon {
+          top: -1.25rem;
+
+          &:before {
+            position: absolute;
+            top: 30%;
+            left: 30%;
+            width: 50%;
+            height: 50%;
+            content: "";
+            background-color: #fff;
+          }
+
+          &.small-icon {
+            top: -1rem;
+
+            & > span {
+              height: 1.5rem;
+              width: 1.5rem;
+            }
+          }
+
+          & > span {
+            background: transparent
+              url("../../../public/assets/images/svg/tokens/xdc.svg") no-repeat
+              center center;
+            background-size: contain;
+            transform: scaleX(-1);
+          }
+        }
+      }
+    }
+  }
+
+  .progress-indicators {
+    color: transparentize($white, 0.66);
+    display: flex;
+    font-size: 1.5rem;
+    margin-top: 2.4rem;
+    position: relative;
+
+    span {
+      display: flex;
+      align-items: center;
+
+      &.value {
+        color: transparentize($white, 0.33);
+        position: absolute;
+        white-space: nowrap;
+      }
+
+      .progress-token-icon {
+        width: 2rem;
+        margin-right: 0.6rem;
+      }
+
+      &.end {
+        margin-left: auto;
+      }
+    }
+  }
+
+  .progress-indicators-percentage {
+    color: transparentize($white, 0.33);
+    position: absolute;
+    right: 0rem;
+    top: calc(-1 * min(4.2vw, 6rem));
+
+    @media all and (max-width: $mobile-large) {
+      top: calc(-1 * min(6rem, 6rem));
+    }
+
+    sup {
+      font-size: 60%;
+      position: relative;
+      top: -0.7rem;
+    }
+  }
+
+  @media all and (max-width: $mobile-large) {
+    .progress-bar {
+      .progress-indicators {
+        span {
+          font-size: 2rem;
+        }
+      }
+    }
+  }
+
+  @media all and (max-width: $mobile-small) {
+    .progress-indicators {
+      span {
+        word-break: break-all;
+      }
+    }
+  }
+}

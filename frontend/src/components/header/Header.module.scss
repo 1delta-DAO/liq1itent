@@ -1,0 +1,114 @@
+@import "../../../public/assets/styles/_variables/colors";
+@import "../../../public/assets/styles/_variables/breakpoints";
+@import "../../../public/assets/styles/_variables/_mixins";
+@import "../../../public/assets/styles/_variables/_sizes";
+
+.header-wrapper {
+  align-items: center;
+  display: flex;
+  margin-top: $tab;
+  margin-bottom: $tab-double;
+  margin-right: $tab-double;
+
+  .header-logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-right: $header-logo-spacing;
+
+    .header-logo {
+      user-select: none;
+      width: $header-logo-size;
+
+      image {
+        width: $header-logo-size;
+      }
+    }
+  }
+
+  .header-title {
+    font-size: $header-title-font;
+    font-family: "Inter", sans-serif;
+    color: $main-lightest;
+    text-shadow: $text-glow;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-direction: column;
+
+    .sub-title {
+      font-size: $header-subtitle-font;
+      margin-top: 4px;
+      margin-left: 16px;
+      color: $main-lightish;
+      text-shadow: $text-glow;
+    }
+  }
+
+  .menu {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    margin-left: auto;
+  }
+
+  @media all and (max-width: $desktop-small) {
+    margin-top: $tab-mobile-large;
+    margin-bottom: $tab-double-mobile-large;
+    margin-right: 0;
+    .header-logo-wrapper {
+      margin-right: $header-logo-spacing-mobile-large;
+      .header-logo {
+        width: $header-logo-size-mobile-large;
+      }
+    }
+
+    .header-title {
+      font-size: $header-title-font-desktop-small;
+      .sub-title {
+        font-size: $header-subtitle-font-desktop-small;
+        margin-top: 3px;
+        margin-left: 12px;
+      }
+    }
+  }
+
+  @media all and (max-width: $mobile-large) {
+    margin-top: $tab-double-mobile-large;
+    margin-bottom: $tab-double-mobile-large;
+    margin-right: 0;
+    .header-logo-wrapper {
+      margin-right: $header-logo-spacing-mobile-large;
+      .header-logo {
+        width: $header-logo-size-mobile-large;
+      }
+    }
+
+    .header-title {
+      font-size: $header-title-font-mobile-large;
+      .sub-title {
+        font-size: $header-subtitle-font-mobile-large;
+        margin-top: 0.15vw;
+        margin-left: 0.8vw;
+      }
+    }
+  }
+
+  @media all and (max-width: $mobile-small) {
+    margin-top: $tab-double-mobile-small;
+    margin-bottom: $tab-double-mobile-small;
+    margin-right: 0;
+    .header-logo-wrapper {
+      margin-right: $header-logo-spacing-mobile-small;
+      .header-logo {
+        width: $header-logo-size-mobile-small;
+      }
+    }
+    .header-title {
+      font-size: $header-title-font-mobile-small;
+      .sub-title {
+        font-size: $header-subtitle-font-mobile-small;
+      }
+    }
+  }
+}

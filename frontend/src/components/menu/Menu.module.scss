@@ -1,0 +1,54 @@
+@import "../../../public/assets/styles/_variables/colors";
+@import "../../../public/assets/styles/_variables/breakpoints";
+
+:export {
+  mobile: $mobile-large;
+}
+
+.menu {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  margin-left: auto;
+  margin-right: 48px;
+}
+
+.connect {
+  margin-right: 0px;
+}
+
+@media all and (max-width: $mobile-large) {
+  .menu {
+    flex-direction: column;
+    justify-content: center;
+    height: 140vh;
+    top: -180vh;
+    opacity: 1;
+    position: fixed;
+    left: 0px;
+    transition: 0.4s ease-in-out;
+    background: transparentize($black, 0.2);
+    backdrop-filter: blur(5px);
+    padding: 10rem 0;
+    width: 100vw;
+    z-index: 14;
+
+    &.visible {
+      top: -30vh;
+    }
+  }
+
+  .connect {
+    right: 0;
+    position: absolute;
+    margin-right: calc(4vw + 6rem);
+  }
+}
+
+@media all and (max-width: $mobile-small) {
+  .connect {
+    right: 0;
+    position: absolute;
+    margin-right: calc(1rem + 10vw);
+  }
+}

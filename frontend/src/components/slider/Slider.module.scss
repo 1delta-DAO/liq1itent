@@ -1,0 +1,64 @@
+@import "../../../public/assets/styles/_variables/colors";
+@import "../../../public/assets/styles/_variables/breakpoints";
+:root {
+  --main-color: rgb(104, 117, 217);
+  --main-color-hover: rgb(104, 117, 217, 0.2);
+  --track-color: #ddd;
+}
+
+.customSlider {
+  width: calc(100% - 16px);
+
+  height: 2rem;
+  &.disabled {
+    filter: opacity(0.3);
+    .customSlider-thumb {
+      cursor: initial;
+    }
+    .customSlider-thumb:hover {
+      box-shadow: none;
+    }
+  }
+}
+
+.customSlider-track {
+  top: 8px;
+  height: 4px;
+  background: transparentize($main-medium, 0.7);
+  border-radius: 3.2rem;
+  @media all and (max-width: $mobile-large) {
+    height: 7px;
+    top: 7px;
+  }
+}
+
+.customSlider-track:first-of-type {
+  top: 8px;
+  height: 4px;
+  background: $main-medium;
+  @media all and (max-width: $mobile-large) {
+    height: 7px;
+    top: 7px;
+  }
+}
+
+.customSlider-thumb {
+  cursor: pointer;
+  background: $main-light;
+  margin-top: 5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  outline: none;
+  z-index: 2;
+  @media all and (max-width: $mobile-large) {
+    margin-top: 3px;
+    width: 15px;
+    height: 15px;
+    border: 3px solid white;
+  }
+}
+
+.customSlider-thumb:hover {
+  box-shadow: 0 0 0 6px transparentize($main-light, 0.8);
+}

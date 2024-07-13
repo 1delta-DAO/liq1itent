@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="26" height="32" viewBox="0 0 26 32">
+  <g id="Group_886" data-name="Group 886" transform="translate(-1 -1.999)" style="isolation: isolate">
+    <path id="Path_10803" data-name="Path 10803" d="M72,16V11.593A9.5,9.5,0,1,1,91,11.5c0,1.4,0,3.411,0,4.5H86s0-3.1,0-4.5a4.5,4.5,0,1,0-9,.056V16Z" transform="translate(-67.5 0)" fill="#006ea2"/>
+    <path id="Path_10804" data-name="Path 10804" d="M24,256H4a3,3,0,0,0-3,3v12a3,3,0,0,0,3,3H24a3,3,0,0,0,3-3V259a3,3,0,0,0-3-3Zm-7.5,10.5a2.5,2.5,0,1,1-5,0v-3a2.5,2.5,0,1,1,5,0Z" transform="translate(0 -240.001)" fill="#006ea2"/>
+  </g>
+</svg>
