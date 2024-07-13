@@ -31,3 +31,7 @@ Go to `localhost:4000/api` to see the API documentation.
 ```bash
 /order/get
 ```
+#### Update order status
+```bash
+/order/update-status
+```
