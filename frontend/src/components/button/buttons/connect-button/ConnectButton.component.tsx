@@ -1,54 +1,46 @@
-import React, { useEffect, useMemo } from "react";
+import React, { FunctionComponent, useState, useEffect } from "react";
 import { useWeb3React } from "@web3-react/core";
 
 import { ButtonComponent } from "../../Button.component";
 import { useConnectModal } from "../../../modal/modals/connect/connect.modal";
-import { useAccountInfoModal } from "../../../modal/modals/account/account-info.modal";
 import { getNetwork } from "../../../../config/networks.config";
 
 import styles from "./ConnectButton.module.scss";
 
-export const ConnectButtonComponent: React.FC = () => {
-  const { showModal: showConnectModal } = useConnectModal();
-  const { showModal: showAccountInfoModal } = useAccountInfoModal();
-  const { account, chainId, error, deactivate } = useWeb3React();
+interface ConnectButtonProps {
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
+  loggedIn: boolean;
+}
 
-  const mobileSize = 768;
+export const ConnectButtonComponent: FunctionComponent<ConnectButtonProps> = (
+  props: ConnectButtonProps
+): JSX.Element => {
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    if (chainId && getNetwork(chainId) === undefined) {
-      deactivate();
-    }
-  }, [chainId, deactivate, error]);
+    setLoggedIn(props.loggedIn);
+  }, [props.loggedIn]);
 
-  const shortenedAccount = useMemo(
-    () =>
-      account
-        ? window.innerWidth > mobileSize
-          ? `${account.slice(0, 4)}...${account.slice(account.length - 4)}`
-          : `${account.slice(0, 7)}`
-        : null,
-    [account]
-  );
+  const handleLogin = (): void => {
+    console.log("login");
+    void props.login();
+  };
 
-  const chainIcon = useMemo(() => {
-    if (!chainId) return undefined;
-    const network = getNetwork(chainId);
-    if (network) {
-      return network.icon;
-    }
-    return undefined;
-  }, [chainId]);
+  const handleLogout = (): void => {
+    console.log("logout");
+    void props.logout();
+  };
 
   return (
     <div className={styles["connect"]}>
-      {!shortenedAccount ? (
-        <ButtonComponent text={"CONNECT"} onClick={showConnectModal} />
+      {!loggedIn ? (
+        <ButtonComponent text={"CONNECT"} onClick={handleLogin} />
       ) : (
         <ButtonComponent
-          icon={window.innerWidth > mobileSize ? chainIcon : undefined}
-          text={shortenedAccount}
-          onClick={showAccountInfoModal}
+          icon={undefined}
+          text={"CONNECTED"}
+          onClick={handleLogout}
         />
       )}
     </div>

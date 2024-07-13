@@ -40,7 +40,6 @@ export const TradeComponent: React.FC = () => {
   const [selectedPair, setSelectedPair] = useState<number>(0);
   const [long, setLong] = useState(0);
   const [leverage, setLeverage] = useState(1);
-  const [maxLeverage, setMaxLeverage] = useState(20);
   const [deposit, setDeposit] = useState("0");
   const [projectedAddress, setProjectedAddress] = useState("");
   const [amountApproved, setAmountApproved] = useState("0");
@@ -111,7 +110,7 @@ export const TradeComponent: React.FC = () => {
     if (pair) {
       setSelectedTVPair(pair.tvPairName);
     }
-  }, [selectedPair]);
+  }, [selectedPair, setSelectedTVPair]);
 
   useEffect(() => {
     let swapAmount = "0";
@@ -373,19 +372,6 @@ export const TradeComponent: React.FC = () => {
               </>
             )}
           />
-        </div>
-        <div className={styles["leverage-label"]}>Leverage:</div>
-        <div className={styles["leverage"]}>
-          <div className={styles["leverage-input"]}>
-            <input type="string" value={leverage} disabled={false} />
-          </div>
-          <div className={styles["leverage-slider"]}>
-            <Slider
-              max={maxLeverage}
-              currentValue={leverage}
-              onChange={(value): void => onLeverageChange(value)}
-            />
-          </div>
         </div>
         {renderButton()}
       </div>
