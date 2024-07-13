@@ -1,16 +1,19 @@
 
 import { ethers } from "hardhat";
 import { Settlement__factory } from "../types";
-import { solidityPacked } from "ethers";
+import { ChainId, ENDPOINT_ADDRESSES } from "./addresses";
 
 async function main() {
     const accounts = await ethers.getSigners()
-    const operator = accounts[1]
+    const operator = accounts[0]
 
-    const mantleEndpoint = '0x1a44076050125825900e736c501f859c50fE728c'
+    const mantleEndpoint = ENDPOINT_ADDRESSES[ChainId.MANTLE]
     const settlement = await new Settlement__factory(operator).deploy(
-      mantleEndpoint  
+        mantleEndpoint,
+        operator.address
     )
+    const address = await settlement.getAddress()
+    console.log("settlement address", address)
 }
 
 main()

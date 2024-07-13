@@ -2,8 +2,8 @@ import { AbiCoder, parseEther, solidityPacked, ZeroAddress } from "ethers"
 import { ethers } from 'hardhat';
 
 import {
-    LZEndpointMock,
-    LZEndpointMock__factory,
+    EndpointV2Mock,
+    EndpointV2Mock__factory,
     MockERC20,
     MockERC20__factory,
     MockSettlement,
@@ -13,13 +13,14 @@ import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers"
 import { expect } from "chai";
 import { CrossChainOrder, getHash, getOrder, padAddress } from "./utils";
 import { getPackedSig } from "./utils/signature_utils";
+import { Options } from '@layerzerolabs/lz-v2-utilities';
 
 describe("EvmOrder: ", function () {
     const localChainId = 1
     const remoteChainId = 2
 
-    let localEndpoint: LZEndpointMock
-    let remoteEndpoint: LZEndpointMock
+    let localEndpoint: EndpointV2Mock
+    let remoteEndpoint: EndpointV2Mock
     let remotePath, localPath
     let owner: SignerWithAddress;
     let swapper: SignerWithAddress;
@@ -59,20 +60,23 @@ describe("EvmOrder: ", function () {
     })
 
     beforeEach(async function () {
-        localEndpoint = await new LZEndpointMock__factory(owner).deploy(localChainId)
-        remoteEndpoint = await new LZEndpointMock__factory(owner).deploy(remoteChainId)
+        localEndpoint = await new EndpointV2Mock__factory(owner).deploy(localChainId)
+        remoteEndpoint = await new EndpointV2Mock__factory(owner).deploy(remoteChainId)
         localEndpointAddress = await localEndpoint.getAddress()
         remoteEndpointAddress = await remoteEndpoint.getAddress()
 
-
-        localSettlement = await new MockSettlement__factory(owner).deploy(localEndpoint)
-        remoteSettlement = await new MockSettlement__factory(owner).deploy(remoteEndpoint)
+        localSettlement = await new MockSettlement__factory(owner).deploy(localEndpoint, ownerAddress)
+        remoteSettlement = await new MockSettlement__factory(owner).deploy(remoteEndpoint, ownerAddress)
         await localSettlement.mockSetChainId(localChainId)
         await remoteSettlement.mockSetChainId(remoteChainId)
+
+        await localSettlement.mockSetChainIdEidPair(remoteChainId, remoteChainId)
+        await remoteSettlement.mockSetChainIdEidPair(localChainId, localChainId)
+
         localSettlementAddress = await localSettlement.getAddress()
         remoteSettlementAddress = await remoteSettlement.getAddress()
 
-        // create two OmnichainFungibleToken instances
+        // create two regular token instances
         localErc20 = await new MockERC20__factory(owner).deploy("ERC20", "ERC20", 18)
         localErc20Address = await localErc20.getAddress()
         remoteErc20 = await new MockERC20__factory(owner).deploy("ERC20", "ERC20", 18)
@@ -86,13 +90,10 @@ describe("EvmOrder: ", function () {
         remotePath = solidityPacked(["address", "address"], [remoteSettlementAddress, localSettlementAddress])
         localPath = solidityPacked(["address", "address"], [localSettlementAddress, remoteSettlementAddress])
 
-        await localSettlement.setMinDstGas(remoteChainId, 0, 200000)
-        await localSettlement.setMinDstGas(remoteChainId, 1, 200000)
-        await remoteSettlement.setMinDstGas(localChainId, 0, 200000)
-        await remoteSettlement.setMinDstGas(localChainId, 1, 200000)
+        // set the trusted peers
+        await localSettlement.setPeer(remoteChainId, padAddress(remoteSettlementAddress)) // for A, set B
+        await remoteSettlement.setPeer(localChainId, padAddress(localSettlementAddress)) // for B, set A
 
-        await localSettlement.setTrustedRemote(remoteChainId, remotePath) // for A, set B
-        await remoteSettlement.setTrustedRemote(localChainId, localPath) // for B, set A
     })
 
 
@@ -195,21 +196,20 @@ describe("EvmOrder: ", function () {
             buyAmount
         )
 
-        let nativeFee = (await localSettlement.estimateSendFee(
-            remoteChainId,
-            padAddress(solverAddress),
-            hash,
-            false,
-            defaultAdapterParams
-        )
-        ).nativeFee
+        const options = Options.newOptions().addExecutorLzReceiveOption(650000, 0).toHex().toString()
 
+        const testMessage = solidityPacked(['bytes32', 'bytes32'], [hash, padAddress(solverAddress)])
+        // Define native fee and quote for the message send operation
+        let nativeFee = 0n
+        ;[nativeFee] = await remoteSettlement.quote(localChainId, testMessage, options, false)
+
+        // const options 
         console.log("settle")
         await remoteSettlement.connect(solver).settle(
             padAddress(solverAddress),
             order,
             defaultAdapterParams,
-            { value: nativeFee }
+            { value: nativeFee  } // we are generous to make sure it runs through
         )
 
         const balanceSwapperDestination = await remoteErc20.balanceOf(swapperAddress)
