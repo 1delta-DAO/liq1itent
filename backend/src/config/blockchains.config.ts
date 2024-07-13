@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 
 export const findWorkingRpc = async (
   chainId: ChainId
-): Promise<{ rpc: string; wsRpc: string }> => {
+): Promise<ethers.providers.JsonRpcProvider> => {
   let stop = false;
   const rpcList = blockchainsConfig[chainId].rpcs;
   while (!stop) {
@@ -21,7 +21,7 @@ export const findWorkingRpc = async (
       await provider.getBlockNumber();
       randomRpc.isWorking = true;
       stop = true;
-      return randomRpc;
+      return provider as ethers.providers.JsonRpcProvider;
     } catch (error) {
       randomRpc.isWorking = false;
     }

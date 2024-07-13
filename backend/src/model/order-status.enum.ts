@@ -1,5 +1,9 @@
 export enum OrderStatus {
   NEW = "NEW",
-  INITIATED = "INITIATED",
+  PENDING = "PENDING",
   FILLED = "FILLED",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+  EXPIRED = "EXPIRED",
+  RETRY = "RETRY",
 }

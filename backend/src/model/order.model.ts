@@ -7,6 +7,7 @@ export class Order {
   swapperWalletType: WalletType;
   status: OrderStatus;
   nonce: number;
+  signature: string;
   created: Date;
   initiateDeadlineBlock: number;
   fillDeadlineBlock: number;

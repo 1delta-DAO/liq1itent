@@ -42,6 +42,13 @@ export class OrderInput {
   nonce: number;
 
   @ApiProperty({
+    type: String,
+    example: "0x0",
+    required: true,
+  })
+  signature: string;
+
+  @ApiProperty({
     type: Date,
     example: new Date(),
     required: true,
