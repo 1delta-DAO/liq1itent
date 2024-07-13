@@ -1,7 +1,7 @@
 import { AbiCoder, MaxUint256, parseEther, solidityPacked, ZeroAddress } from "ethers"
 import { ethers } from 'hardhat';
 
-import { ERC20__factory, LZEndpointMock, LZEndpointMock__factory, MockERC20, MockERC20__factory, OFTV2, OFTV2__factory, ProxyOFTV2, ProxyOFTV2__factory } from "../types"
+import { LZEndpointMock, LZEndpointMock__factory, MockERC20, MockERC20__factory, OFTV2, OFTV2__factory, ProxyOFTV2, ProxyOFTV2__factory } from "../types"
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers"
 import { expect } from "chai";
 
