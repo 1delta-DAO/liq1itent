@@ -9,7 +9,8 @@ async function main() {
 
     const mantleEndpoint = ENDPOINT_ADDRESSES[ChainId.MANTLE]
     const settlement = await new Settlement__factory(operator).deploy(
-        mantleEndpoint
+        mantleEndpoint,
+        operator.address
     )
     const address = await settlement.getAddress()
     console.log("settlement address", address)
