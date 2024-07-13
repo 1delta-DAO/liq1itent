@@ -171,7 +171,7 @@ export const AppComponent = (): JSX.Element => {
     const privateKey = await rpc.getPrivateKey();
 
     if (chainId == 5000) {
-      const polygonPrivateKeyProvider = new EthereumPrivateKeyProvider({
+      const mantlePRivateKeyProvider = new EthereumPrivateKeyProvider({
         config: {
           chainConfig: {
             chainNamespace: CHAIN_NAMESPACES.EIP155,
@@ -185,8 +185,8 @@ export const AppComponent = (): JSX.Element => {
           },
         },
       });
-      await polygonPrivateKeyProvider.setupProvider(privateKey);
-      const web3 = new Web3(polygonPrivateKeyProvider);
+      await mantlePRivateKeyProvider.setupProvider(privateKey);
+      const web3 = new Web3(mantlePRivateKeyProvider);
       return web3;
     } else {
       const polygonPrivateKeyProvider = new EthereumPrivateKeyProvider({
