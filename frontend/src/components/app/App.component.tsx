@@ -1,9 +1,7 @@
 /* eslint-disable */
 import React from "react";
 import { HeaderComponent } from "../header/Header.component";
-import { TabContainer } from "../tab-container/TabContainer.component";
-import { tabs } from "../../data/tabs";
-import { useMenu } from "../menu/useMenu";
+import styles from "./swap.module.scss";
 
 import { useEffect, useState } from "react";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
@@ -19,7 +17,6 @@ import SolanaRPC from "../../RPC/solanaRPC"; // for using solana
 import { TradeComponent } from "../trade/trade.component";
 
 export const AppComponent = (): JSX.Element => {
-  const { selectedTab } = useMenu();
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
@@ -54,7 +51,7 @@ export const AppComponent = (): JSX.Element => {
       return;
     }
     // EVM chains
-    const polygon_address = await getPolygonAddress();
+    //const polygon_address = await getPolygonAddress();
     const bnb_address = await getBnbAddress();
     
     const rpcETH = new EthereumRPC(provider);
@@ -65,7 +62,7 @@ export const AppComponent = (): JSX.Element => {
     let solana_address = await solanaRPC.getAccounts();
 
     uiConsole(
-      "Polygon Address: " + polygon_address,
+      //"Polygon Address: " + polygon_address,
       "BNB Address: " + bnb_address,
       "Solana Address: " + solana_address,
     );
@@ -251,7 +248,9 @@ export const AppComponent = (): JSX.Element => {
   return (
     <main>
       <HeaderComponent title="Liqu1tent" subTitle="by 1delta" login={login} logout={logout} loggedIn={loggedIn} />
-      <TradeComponent getWeb3Provider={getWeb3Provider} />
+      <div className={styles["swap"]}>
+        <TradeComponent getWeb3Provider={getWeb3Provider} />
+      </div>
     </main>
   );
 };
