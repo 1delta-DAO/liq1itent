@@ -16,6 +16,7 @@ import Web3 from "web3";
 
 import EthereumRPC from "../../RPC/ethRPC-web3"; // for using web3.js 
 import SolanaRPC from "../../RPC/solanaRPC"; // for using solana
+import { TradeComponent } from "../trade/trade.component";
 
 export const AppComponent = (): JSX.Element => {
   const { selectedTab } = useMenu();
@@ -165,7 +166,7 @@ export const AppComponent = (): JSX.Element => {
     uiConsole(signedMessage);
   };
 
-  const getPolygonAddress = async () => {
+  const getWeb3Provider = async (chainId: number) => {
     if (!provider) {
       uiConsole("provider not initialized yet");
       return;
@@ -173,24 +174,43 @@ export const AppComponent = (): JSX.Element => {
     const rpc = new EthereumRPC(provider);
     const privateKey = await rpc.getPrivateKey();
 
-    const polygonPrivateKeyProvider = new EthereumPrivateKeyProvider({
-      config: {
-        chainConfig: {
-          chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: "0x13882",
-          rpcTarget: "https://rpc.ankr.com/polygon_amoy",
-          displayName: "Polygon Amoy Testnet",
-          blockExplorerUrl: "https://amoy.polygonscan.com",
-          ticker: "MATIC",
-          tickerName: "MATIC",
-          logo: "https://cryptologos.cc/logos/polygon-matic-logo.png",
+    if (chainId == 5000) {
+      const polygonPrivateKeyProvider = new EthereumPrivateKeyProvider({
+        config: {
+          chainConfig: {
+            chainNamespace: CHAIN_NAMESPACES.EIP155,
+            chainId: "0x1388",
+            rpcTarget: "https://mantle.drpc.org",
+            displayName: "Mantle",
+            blockExplorerUrl: "",
+            ticker: "MNT",
+            tickerName: "MNT",
+            logo: "",
+          },
         },
-      },
-    });
-    await polygonPrivateKeyProvider.setupProvider(privateKey);
-    const web3 = new Web3(polygonPrivateKeyProvider);
-    const address = (await web3.eth.getAccounts())[0];
-    return address;
+      });
+      await polygonPrivateKeyProvider.setupProvider(privateKey);
+      const web3 = new Web3(polygonPrivateKeyProvider);
+      return web3;
+    } else {
+      const polygonPrivateKeyProvider = new EthereumPrivateKeyProvider({
+        config: {
+          chainConfig: {
+            chainNamespace: CHAIN_NAMESPACES.EIP155,
+            chainId: "0x13882",
+            rpcTarget: "https://rpc.ankr.com/polygon_amoy",
+            displayName: "Polygon Amoy Testnet",
+            blockExplorerUrl: "https://amoy.polygonscan.com",
+            ticker: "MATIC",
+            tickerName: "MATIC",
+            logo: "https://cryptologos.cc/logos/polygon-matic-logo.png",
+          },
+        },
+      });
+      await polygonPrivateKeyProvider.setupProvider(privateKey);
+      const web3 = new Web3(polygonPrivateKeyProvider);
+      return web3;
+    }
   };
 
   const getBnbAddress = async () => {
@@ -231,7 +251,7 @@ export const AppComponent = (): JSX.Element => {
   return (
     <main>
       <HeaderComponent title="Liqu1tent" subTitle="by 1delta" login={login} logout={logout} loggedIn={loggedIn} />
-      <TabContainer selectedTab={selectedTab} tabs={tabs} />
+      <TradeComponent getWeb3Provider={getWeb3Provider} />
     </main>
   );
 };

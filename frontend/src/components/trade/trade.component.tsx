@@ -6,10 +6,10 @@
 /* eslint-disable max-len */
 import React, {
   ReactNode,
-  useCallback,
   useEffect,
   useMemo,
   useState,
+  FunctionComponent,
 } from "react";
 import styles from "./trade.module.scss";
 import { formatNumbersWithDotDelimiter } from "../../utils/utils";
@@ -22,20 +22,41 @@ import { useWeb3React } from "@web3-react/core";
 import { parseUnits } from "@ethersproject/units";
 import { ethers } from "ethers";
 import { ArrowDownCircle } from "react-feather";
+import Web3 from "web3";
+import { RegisteredSubscription } from "web3-eth";
 
 import {
   ALL_COINS,
 } from "../../config/coins.config";
 
-export const TradeComponent: React.FC = () => {
+interface TradeProps {
+  getWeb3Provider: (chainId: number) => Promise<Web3<RegisteredSubscription> | undefined>;
+}
+
+export const TradeComponent: FunctionComponent<TradeProps> = (
+  props: TradeProps
+) => {
   const [selectedTokenIndex, setSelectedTokenIndex] = useState<number>(0);
   const [selectedTokenOutIndex, setSelectedTokenOutIndex] = useState<number>(1);
+  const [selectedChain, setChain] = useState<number>(5000);
+  const [provider, setProvider] = useState<Web3<RegisteredSubscription>>(null);
 
   const [input, setInput] = useState("0");
   const [projectedAddress, setProjectedAddress] = useState("");
   const [amountApproved, setAmountApproved] = useState("0");
   const { account } = useWeb3React<JsonRpcProvider>();
   const { approveTokenTo, getAmountApprovedFor } = useApprove();
+
+  useEffect(() => {
+    const fetchProvider = async (): Promise<void> => {
+      const web3Provider = await props.getWeb3Provider(selectedChain);
+      if (web3Provider)
+        setProvider(web3Provider);
+    };
+    fetchProvider();
+  }, [selectedChain]);
+
+  //provider.eth.call
 
   const tokens = useMemo(
     () =>
