@@ -39,7 +39,7 @@ export const TradeComponent: FunctionComponent<TradeProps> = (
   const [selectedTokenIndex, setSelectedTokenIndex] = useState<number>(0);
   const [selectedTokenOutIndex, setSelectedTokenOutIndex] = useState<number>(1);
   const [selectedChain, setChain] = useState<number>(5000);
-  const [provider, setProvider] = useState<Web3<RegisteredSubscription>>(null);
+  const [provider, setProvider] = useState<Web3<RegisteredSubscription> | undefined>(undefined);
 
   const [input, setInput] = useState("0");
   const [projectedAddress, setProjectedAddress] = useState("");
@@ -50,8 +50,7 @@ export const TradeComponent: FunctionComponent<TradeProps> = (
   useEffect(() => {
     const fetchProvider = async (): Promise<void> => {
       const web3Provider = await props.getWeb3Provider(selectedChain);
-      if (web3Provider)
-        setProvider(web3Provider);
+      setProvider(web3Provider);
     };
     fetchProvider();
   }, [selectedChain]);
