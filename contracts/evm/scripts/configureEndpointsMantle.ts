@@ -1,6 +1,6 @@
 
 import { ethers } from "hardhat";
-import { Settlement__factory } from "../types";
+import { Settlement, Settlement__factory } from "../types";
 import { ChainId, ENDPOINT_IDS, SETTLEMENT_ADDRESSES } from "./dataMappings";
 import { padAddress } from "../test/utils";
 
@@ -8,7 +8,7 @@ async function main() {
     const [operator] = await ethers.getSigners()
     const chainId = ChainId.MANTLE
     // get settlement contract
-    const settlement = await new Settlement__factory(operator).attach(SETTLEMENT_ADDRESSES[chainId])
+    const settlement: Settlement = await new Settlement__factory(operator).attach(SETTLEMENT_ADDRESSES[chainId]) as any
 
     // add peers
     let dstChain = ChainId.POLYGON

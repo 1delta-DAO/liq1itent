@@ -13,6 +13,10 @@ On top of this, one needs to think of a better identifier than just `chainId` si
 Install: `yarn`
 Compile: `npx hardhat compile`
 
+### Manually configure messaging
+
+The scripts in `scripts/painful` have to be run to ensure that the traffix between a pair of settlement contracts is correctly defined. 
+
 ## Tests
 
 The tests show 
