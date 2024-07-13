@@ -20,16 +20,59 @@ contract Settlement is Initializable, NonblockingLzApp {
 
     error NotTooRelevantRightNow();
     error InvalidOrderSignature(bytes32 hash);
+    error CallerNotMakerOrTaker();
+    error AlreadyFilled(bytes32 hash);
+    error NoPartialFills(bytes32 hash);
+    error BadOriginChainId(uint256 expectedChainId, uint256 providedChainId);
+    error BadDestinationChainId(
+        uint256 expectedChainId,
+        uint256 providedChainId
+    );
+
+    /*//////////////////////////////////////////////////////////////
+                                TYPES
+    //////////////////////////////////////////////////////////////*/
+
+    enum OrderStatus {
+        FILLED,
+        CANCELLED,
+        EXPIRED,
+        PENDING,
+        RETRY
+    }
+
+    struct OrderData {
+        OrderStatus status;
+        bytes32 maker;
+        bytes32 makerToken;
+        uint256 makerAmount;
+        uint256 takerAmount;
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                                IMMUTABLES
+    //////////////////////////////////////////////////////////////*/
+
+    uint256 public immutable THIS_CHAIN_ID;
 
     /*//////////////////////////////////////////////////////////////
                                 STATE
     //////////////////////////////////////////////////////////////*/
 
-    address public FILLER_ORACLE;
-
     address payable public REFUND_ADDRESS;
+    mapping(uint32 => mapping(bytes32 => OrderData)) statuses;
 
-    constructor(address endpoint) NonblockingLzApp(endpoint) {}
+    /*//////////////////////////////////////////////////////////////
+                                CONSTRUCTOR
+    //////////////////////////////////////////////////////////////*/
+
+    constructor(address endpoint) NonblockingLzApp(endpoint) {
+        uint256 cId;
+        assembly {
+            cId := chainid()
+        }
+        THIS_CHAIN_ID = cId;
+    }
 
     /// @notice Initiates the settlement of a cross-chain order
     /// @dev To be called by the filler
@@ -41,6 +84,10 @@ contract Settlement is Initializable, NonblockingLzApp {
         bytes calldata signature,
         bytes calldata fillerData
     ) external {
+        // validate chain - origin id
+        if (THIS_CHAIN_ID != order.originChainId)
+            revert BadOriginChainId(THIS_CHAIN_ID, order.originChainId);
+
         // compute the order hash
         bytes32 orderHash = OrderLib.getHash(order);
         // verify order sig
@@ -49,23 +96,14 @@ contract Settlement is Initializable, NonblockingLzApp {
             OrderSig.getSignerOfHash(orderHash, signature)
         ) revert InvalidOrderSignature(orderHash);
 
-        address fillerOracle = FILLER_ORACLE;
         // report the status to the oracle
-        IFillerOracle(fillerOracle).reportSettlementAttempt(order, orderHash);
+        _reportSettlementAttempt(order, orderHash);
         // transfer maker amount to oracle
         IERC20(order.originToken.toEvmAddress()).safeTransferFrom(
             order.swapper.toEvmAddress(),
-            fillerOracle,
+            address(this),
             order.originAmount
         );
-    }
-
-    function inititalize(
-        address fillerOracle,
-        address refundAddress
-    ) public initializer {
-        FILLER_ORACLE = fillerOracle;
-        REFUND_ADDRESS = payable(refundAddress);
     }
 
     /// @notice Resolves a specific CrossChainOrder into a generic ResolvedCrossChainOrder
@@ -84,6 +122,13 @@ contract Settlement is Initializable, NonblockingLzApp {
         OrderLib.CrossChainOrder calldata order,
         bytes calldata adapterParams
     ) external payable {
+        // validate chain - destination id
+        if (THIS_CHAIN_ID != order.destinationChainId)
+            revert BadDestinationChainId(
+                THIS_CHAIN_ID,
+                order.destinationChainId
+            );
+
         uint16 _dstChainId = uint16(order.destinationChainId);
         bytes memory trustedRemote = trustedRemoteLookup[_dstChainId];
         require(
@@ -118,6 +163,50 @@ contract Settlement is Initializable, NonblockingLzApp {
             msg.sender,
             adapterParams
         );
+    }
+
+    function lzReceive(
+        uint16 _srcChainId,
+        bytes calldata _srcAddress,
+        uint64 _nonce,
+        bytes calldata _payload
+    ) public virtual override {
+        // the original `lzReceive` does the access check already
+        super.lzReceive(_srcChainId, _srcAddress, _nonce, _payload);
+        // start business logic here
+        (bytes32 orderHash, bytes32 receiver, OrderStatus fillStatus) = abi
+            .decode(_payload, (bytes32, bytes32, OrderStatus));
+
+        OrderData memory orderData = statuses[_srcChainId][orderHash];
+        if (fillStatus == OrderStatus.FILLED) {
+            // transfer maker amount to filler-defined receiver
+            IERC20(orderData.makerToken.toEvmAddress()).safeTransfer(
+                receiver.toEvmAddress(),
+                orderData.makerAmount
+            );
+        }
+        // user cancelled on destination chain
+        else if (fillStatus == OrderStatus.CANCELLED) {
+            // transfer maker amount back to swapper
+            IERC20(orderData.makerToken.toEvmAddress()).safeTransfer(
+                orderData.maker.toEvmAddress(),
+                orderData.makerAmount
+            );
+        }
+    }
+
+    function _reportSettlementAttempt(
+        OrderLib.CrossChainOrder calldata order,
+        bytes32 orderHash
+    ) internal {
+        OrderData memory orderData = OrderData(
+            OrderStatus.PENDING,
+            order.swapper,
+            order.originToken,
+            order.originAmount,
+            order.destinationAmount
+        );
+        statuses[order.destinationChainId][orderHash] = orderData;
     }
 
     //@notice override this function

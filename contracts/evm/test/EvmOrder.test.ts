@@ -1,7 +1,7 @@
-import { AbiCoder, MaxUint256, parseEther, solidityPacked, ZeroAddress } from "ethers"
+import { AbiCoder, parseEther, solidityPacked, ZeroAddress } from "ethers"
 import { ethers } from 'hardhat';
 
-import { FillerOracle, FillerOracle__factory, LZEndpointMock, LZEndpointMock__factory, MockERC20, MockERC20__factory, OFTV2, OFTV2__factory, ProxyOFTV2, ProxyOFTV2__factory, Settlement, Settlement__factory } from "../types"
+import { LZEndpointMock, LZEndpointMock__factory, MockERC20, MockERC20__factory, OFTV2, OFTV2__factory, ProxyOFTV2, ProxyOFTV2__factory, Settlement, Settlement__factory } from "../types"
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers"
 import { expect } from "chai";
 
@@ -24,14 +24,8 @@ describe("EvmOrder: ", function () {
     let localSettlement: Settlement
     let remoteSettlement: Settlement
 
-    let localFillerOracle: FillerOracle
-    let remoteFillerOracle: FillerOracle
-
     let localSettlementAddress: string
     let remoteSettlementAddress: string
-
-    let localFillerOracleAddress: string
-    let remoteFillerOracleAddress: string
 
     let localErc20Address: string
     let remoteErc20Address: string
@@ -61,15 +55,6 @@ describe("EvmOrder: ", function () {
         localSettlementAddress = await localSettlement.getAddress()
         remoteSettlementAddress = await remoteSettlement.getAddress()
 
-        localFillerOracle = await new FillerOracle__factory(owner).deploy(localSettlementAddress, localEndpointAddress)
-        remoteFillerOracle = await new FillerOracle__factory(owner).deploy(remoteSettlementAddress, remoteEndpointAddress)
-
-        localFillerOracleAddress = await localFillerOracle.getAddress()
-        remoteFillerOracleAddress = await remoteFillerOracle.getAddress()
-
-        await localSettlement.inititalize(localFillerOracleAddress, ownerAddress)
-        await remoteSettlement.inititalize(remoteFillerOracleAddress, ownerAddress)
-
         // create two OmnichainFungibleToken instances
         localErc20 = await new MockERC20__factory(owner).deploy("ERC20", "ERC20", 18)
         localErc20Address = await localErc20.getAddress()
@@ -77,12 +62,12 @@ describe("EvmOrder: ", function () {
         remoteErc20Address = await remoteErc20.getAddress()
 
         // internal bookkeeping for endpoints (not part of a real deploy, just for this test)
-        await localEndpoint.setDestLzEndpoint(remoteFillerOracleAddress, remoteEndpointAddress)
-        await remoteEndpoint.setDestLzEndpoint(localFillerOracleAddress, localEndpointAddress)
+        await localEndpoint.setDestLzEndpoint(remoteSettlementAddress, remoteEndpointAddress)
+        await remoteEndpoint.setDestLzEndpoint(localSettlementAddress, localEndpointAddress)
 
         // set each contracts source address so it can send to each other
-        remotePath = solidityPacked(["address", "address"], [remoteSettlementAddress, localFillerOracleAddress])
-        localPath = solidityPacked(["address", "address"], [localSettlementAddress, remoteFillerOracleAddress])
+        remotePath = solidityPacked(["address", "address"], [remoteSettlementAddress, localSettlementAddress])
+        localPath = solidityPacked(["address", "address"], [localSettlementAddress, remoteSettlementAddress])
 
         await localSettlement.setMinDstGas(remoteChainId, 0, 200000)
         await localSettlement.setMinDstGas(remoteChainId, 1, 200000)

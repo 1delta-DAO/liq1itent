@@ -130,14 +130,13 @@ export interface SettlementInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "DEFAULT_PAYLOAD_SIZE_LIMIT"
-      | "FILLER_ORACLE"
       | "REFUND_ADDRESS"
+      | "THIS_CHAIN_ID"
       | "failedMessages"
       | "forceResumeReceive"
       | "getConfig"
       | "getTrustedRemoteAddress"
       | "initiate"
-      | "inititalize"
       | "isTrustedRemote"
       | "lzEndpoint"
       | "lzReceive"
@@ -179,11 +178,11 @@ export interface SettlementInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "FILLER_ORACLE",
+    functionFragment: "REFUND_ADDRESS",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "REFUND_ADDRESS",
+    functionFragment: "THIS_CHAIN_ID",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -205,10 +204,6 @@ export interface SettlementInterface extends Interface {
   encodeFunctionData(
     functionFragment: "initiate",
     values: [OrderLib.CrossChainOrderStruct, BytesLike, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "inititalize",
-    values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "isTrustedRemote",
@@ -298,11 +293,11 @@ export interface SettlementInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "FILLER_ORACLE",
+    functionFragment: "REFUND_ADDRESS",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "REFUND_ADDRESS",
+    functionFragment: "THIS_CHAIN_ID",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -319,10 +314,6 @@ export interface SettlementInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initiate", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "inititalize",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "isTrustedRemote",
     data: BytesLike
@@ -578,9 +569,9 @@ export interface Settlement extends BaseContract {
 
   DEFAULT_PAYLOAD_SIZE_LIMIT: TypedContractMethod<[], [bigint], "view">;
 
-  FILLER_ORACLE: TypedContractMethod<[], [string], "view">;
-
   REFUND_ADDRESS: TypedContractMethod<[], [string], "view">;
+
+  THIS_CHAIN_ID: TypedContractMethod<[], [bigint], "view">;
 
   failedMessages: TypedContractMethod<
     [arg0: BigNumberish, arg1: BytesLike, arg2: BigNumberish],
@@ -617,12 +608,6 @@ export interface Settlement extends BaseContract {
       signature: BytesLike,
       fillerData: BytesLike
     ],
-    [void],
-    "nonpayable"
-  >;
-
-  inititalize: TypedContractMethod<
-    [fillerOracle: AddressLike, refundAddress: AddressLike],
     [void],
     "nonpayable"
   >;
@@ -779,11 +764,11 @@ export interface Settlement extends BaseContract {
     nameOrSignature: "DEFAULT_PAYLOAD_SIZE_LIMIT"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "FILLER_ORACLE"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
     nameOrSignature: "REFUND_ADDRESS"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "THIS_CHAIN_ID"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "failedMessages"
   ): TypedContractMethod<
@@ -821,13 +806,6 @@ export interface Settlement extends BaseContract {
       signature: BytesLike,
       fillerData: BytesLike
     ],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "inititalize"
-  ): TypedContractMethod<
-    [fillerOracle: AddressLike, refundAddress: AddressLike],
     [void],
     "nonpayable"
   >;
