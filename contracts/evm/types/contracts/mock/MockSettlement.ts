@@ -141,7 +141,6 @@ export interface MockSettlementInterface extends Interface {
       | "getTrustedRemoteAddress"
       | "initiate"
       | "isTrustedRemote"
-      | "ld2sdRate"
       | "lzEndpoint"
       | "lzReceive"
       | "minDstGasLookup"
@@ -227,7 +226,6 @@ export interface MockSettlementInterface extends Interface {
     functionFragment: "isTrustedRemote",
     values: [BigNumberish, BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "ld2sdRate", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "lzEndpoint",
     values?: undefined
@@ -357,7 +355,6 @@ export interface MockSettlementInterface extends Interface {
     functionFragment: "isTrustedRemote",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "ld2sdRate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lzEndpoint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lzReceive", data: BytesLike): Result;
   decodeFunctionResult(
@@ -686,8 +683,6 @@ export interface MockSettlement extends BaseContract {
     "view"
   >;
 
-  ld2sdRate: TypedContractMethod<[], [bigint], "view">;
-
   lzEndpoint: TypedContractMethod<[], [string], "view">;
 
   lzReceive: TypedContractMethod<
@@ -921,9 +916,6 @@ export interface MockSettlement extends BaseContract {
     [boolean],
     "view"
   >;
-  getFunction(
-    nameOrSignature: "ld2sdRate"
-  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "lzEndpoint"
   ): TypedContractMethod<[], [string], "view">;

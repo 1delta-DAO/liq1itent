@@ -26,7 +26,11 @@ describe("EvmOrder: ", function () {
     let owner: SignerWithAddress;
     let swapper: SignerWithAddress;
     let solver: SignerWithAddress
+    let fakeSolver: SignerWithAddress
+    let thief: SignerWithAddress
+    let fakeSolverAddress: string
     let ownerAddress: string;
+    let thiefAddress: string;
     let swapperAddress: string;
     let solverAddress: string
     let localErc20: MockERC20
@@ -47,10 +51,12 @@ describe("EvmOrder: ", function () {
     let defaultAdapterParams = solidityPacked(["uint16", "uint256"], [1, 200000])
 
     before(async function () {
-        [owner, swapper, solver] = await ethers.getSigners();
+        [owner, swapper, solver, fakeSolver, thief] = await ethers.getSigners();
         ownerAddress = await owner.getAddress();
         swapperAddress = await swapper.getAddress();
         solverAddress = await solver.getAddress()
+        fakeSolverAddress = await fakeSolver.getAddress()
+        thiefAddress = await thief.getAddress()
         abiCoder = (new ethers.AbiCoder())
     })
 
@@ -136,15 +142,15 @@ describe("EvmOrder: ", function () {
 
     it("fill x-chain order converntionally", async function () {
         const sellAmount = parseEther("1.00000001") // 1 ether
+        const userBalance = sellAmount * 2n
         const buyAmount = parseEther("0.50000001") // 1 ether
 
 
-
-        await localErc20.mint(swapperAddress, sellAmount)
+        await localErc20.mint(swapperAddress, userBalance)
         await remoteErc20.mint(solverAddress, buyAmount)
 
         // verify alice has tokens and bob has no tokens on remote chain
-        expect(await localErc20.balanceOf(swapperAddress)).to.be.equal(sellAmount)
+        expect(await localErc20.balanceOf(swapperAddress)).to.be.equal(userBalance)
         expect(await remoteErc20.balanceOf(solverAddress)).to.be.equal(buyAmount)
 
         // define order
@@ -166,7 +172,7 @@ describe("EvmOrder: ", function () {
         // swapper needs to approve settlement
         localErc20.connect(swapper).approve(
             localSettlementAddress,
-            sellAmount
+            userBalance
         )
         console.log("initiate")
         // solver initiates solving
@@ -175,6 +181,15 @@ describe("EvmOrder: ", function () {
             signature,
             '0x'
         )
+        // we test that it cannot be initaited twice
+        try {
+            await localSettlement.connect(fakeSolver).initiate(
+                order,
+                signature,
+                '0x'
+            )
+            expect(true).to.equal(false, "should have reverted")
+        } catch (e: any) { }
 
         // solver needs to approve remote settlement
         remoteErc20.connect(solver).approve(
@@ -206,6 +221,21 @@ describe("EvmOrder: ", function () {
         expect(balanceSwapperDestination).to.equal(buyAmount)
         // verify that the solver receives the amount from the swapper
         expect(balanceSolverOrigin).to.equal(sellAmount)
-        
+
+        // test that it cannot be filled twice
+        try {
+            await remoteErc20.mint(fakeSolverAddress, buyAmount)
+            remoteErc20.connect(fakeSolver).approve(
+                remoteSettlementAddress,
+                buyAmount
+            )
+            await remoteSettlement.connect(fakeSolver).settle(
+                padAddress(fakeSolverAddress),
+                order,
+                defaultAdapterParams
+            )
+            expect(true).to.equal(false, "should have reverted")
+        } catch (e: any) { }
+
     })
 })

@@ -24,6 +24,7 @@ contract Settlement is Initializable, NonblockingLzApp {
     error CallerNotMakerOrTaker();
     error AlreadyFilled(bytes32 hash);
     error NoPartialFills(bytes32 hash);
+    error AlreadyFiled(bytes32 hash);
     error BadOriginChainId(uint256 expectedChainId, uint256 providedChainId);
     error BadDestinationChainId(
         uint256 expectedChainId,
@@ -64,8 +65,10 @@ contract Settlement is Initializable, NonblockingLzApp {
 
     address payable public REFUND_ADDRESS;
     uint256 public THIS_CHAIN_ID;
-    uint256 public ld2sdRate;
+    // destinationChainId -> orderHash -> data
     mapping(uint32 => mapping(bytes32 => OrderData)) statuses;
+    // destinationChainId -> orderHash -> isFilled
+    mapping(uint32 => mapping(bytes32 => bool)) filled;
 
     /*//////////////////////////////////////////////////////////////
                                 CONSTRUCTOR
@@ -157,12 +160,20 @@ contract Settlement is Initializable, NonblockingLzApp {
             );
         // the destination chainId for layer 0
         // is the origin chainId of the order
-        uint16 _dstChainId = uint16(order.originChainId);
-        bytes memory trustedRemote = trustedRemoteLookup[_dstChainId];
+        uint16 _layerZeroDstChainId = uint16(order.originChainId);
+        bytes memory trustedRemote = trustedRemoteLookup[_layerZeroDstChainId];
         require(
             trustedRemote.length != 0,
             "LzApp: destination chain is not a trusted source"
         );
+
+        bytes32 orderHash = OrderLib.getHash(order);
+
+        // revert if the order is filled
+        // then set it as filled
+        if (filled[order.destinationChainId][orderHash])
+            revert AlreadyFiled(orderHash);
+        else filled[order.destinationChainId][orderHash] = true;
 
         // Fill the order by transferring funds from the caller to the
         // receiver
@@ -171,8 +182,6 @@ contract Settlement is Initializable, NonblockingLzApp {
             order.destinationReceiver.toEvmAddress(),
             order.destinationAmount
         );
-
-        bytes32 orderHash = OrderLib.getHash(order);
 
         // we set the status to FILLED per default
         // thereretically, many variations are possible here, e.g.
@@ -184,7 +193,7 @@ contract Settlement is Initializable, NonblockingLzApp {
         );
         // transmit the message
         lzEndpoint.send{value: msg.value}(
-            _dstChainId,
+            _layerZeroDstChainId,
             trustedRemote,
             payload,
             REFUND_ADDRESS,
