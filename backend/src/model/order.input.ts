@@ -71,7 +71,7 @@ export class OrderInput {
 
   @ApiProperty({
     type: Number,
-    example: 1,
+    example: 137,
     required: true,
   })
   originChainId: number;
@@ -93,7 +93,7 @@ export class OrderInput {
 
   @ApiProperty({
     type: Number,
-    example: 1,
+    example: 5000,
     required: true,
   })
   destinationChainId: number;

@@ -54,10 +54,10 @@ export const blockchainsConfig: BlockchainsConfig = {
     explorerApiKey: "IN9UA3RUEADNEE3IIF9IB1WJ7W6AT4VTC7",
   },
   [ChainId.mantle]: {
-    settlementAddress: "",
+    settlementAddress: "0x1d051eeD29Df13E1A1d1546329E54036A57AEb77",
     fillerOracleAddress: "",
     rpcs: sepoliaRpcList,
-    explorerUrl: "https://api.etherscan.io/api",
+    explorerUrl: "https://explorer.mantle.xyz/api",
     explorerApiKey: "IN9UA3RUEADNEE3IIF9IB1WJ7W6AT4VTC7",
   },
   [ChainId.solana]: {
@@ -68,7 +68,7 @@ export const blockchainsConfig: BlockchainsConfig = {
     explorerApiKey: "IN9UA3RUEADNEE3IIF9IB1WJ7W6AT4VTC7",
   },
   [ChainId.polygon]: {
-    settlementAddress: "",
+    settlementAddress: "0x1a44076050125825900e736c501f859c50fE728c",
     fillerOracleAddress: "",
     rpcs: sepoliaRpcList,
     explorerUrl: "https://api.etherscan.io/api",

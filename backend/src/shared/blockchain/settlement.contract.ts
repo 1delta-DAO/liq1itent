@@ -2,7 +2,8 @@ import { ChainId } from "../../model/chains.enum";
 import { blockchainsConfig } from "../../config/blockchains.config";
 import { Settlement } from "../../types";
 import { ethers } from "ethers";
-import { SettlementAbi } from "../../abi";
+
+import * as SettlementAbi from "../../abi/Settlement.json";
 
 export function getSettlementContract(
   chainId: ChainId,
@@ -14,6 +15,7 @@ export function getSettlementContract(
     console.log("No settlement contract address found for chainId", chainId);
     return undefined;
   }
+  // console.log("SettlementAbi", SettlementAbi);
   console.log(chainId, settlementContractAddress, "settlementContractAddress");
   const settlementContract = new ethers.Contract(
     settlementContractAddress,
