@@ -130,74 +130,28 @@ export const sepoliaRpcList = [
   },
 ];
 
-export const bscRpcList = [
+export const mantleRpcList = [
   {
     isWorking: true,
-    rpc: "https://rpc.ankr.com/bsc",
+    rpc: "https://rpc.mantle.xyz",
     wsRpc: "",
   },
-  // {
-  //   isWorking: true,
-  //   rpc: "https://bsc-dataseed1.binance.org/",
-  //   wsRpc: "",
-  // },
-  // {
-  //   isWorking: true,
-  //   rpc: "https://bsc-dataseed2.binance.org/",
-  //   wsRpc: "",
-  // },
-  // {
-  //   isWorking: true,
-  //   rpc: "https://bsc-dataseed3.binance.org/",
-  //   wsRpc: "",
-  // },
-  // {
-  //   isWorking: true,
-  //   rpc: "https://bsc-dataseed4.binance.org/",
-  //   wsRpc: "",
-  // },
-  // {
-  //   isWorking: true,
-  //   rpc: "https://bsc-mainnet.core.chainstack.com/8dc261f0c4075d79c3147a918a77261e",
-  //   wsRpc:
-  //     "wss://bsc-mainnet.core.chainstack.com/ws/8dc261f0c4075d79c3147a918a77261e",
-  // },
-  // {
-  //   isWorking: true,
-  //   rpc: "https://bsc-mainnet.core.chainstack.com/1cc9534dc5bbb1f04f647d6b302c6a99",
-  //   wsRpc:
-  //     "wss://bsc-mainnet.core.chainstack.com/ws/1cc9534dc5bbb1f04f647d6b302c6a99",
-  // },
-  // {
-  //   isWorking: true,
-  //   rpc: "https://bsc-mainnet.core.chainstack.com/c2d9d00a30eaa64b108ed05a70f48216",
-  //   wsRpc:
-  //     "wss://bsc-mainnet.core.chainstack.com/ws/c2d9d00a30eaa64b108ed05a70f48216",
-  // },
-  // {
-  //   isWorking: true,
-  //   rpc: "https://bsc-mainnet.core.chainstack.com/c9eb27e09673a2cf480a594d330aa47e",
-  //   wsRpc:
-  //     "wss://bsc-mainnet.core.chainstack.com/ws/c9eb27e09673a2cf480a594d330aa47e",
-  // },
-  // {
-  //   isWorking: true,
-  //   rpc: "https://bsc-mainnet.core.chainstack.com/dd79a926bb5aa370c5ecf5c53c6a4e60",
-  //   wsRpc:
-  //     "wss://bsc-mainnet.core.chainstack.com/ws/dd79a926bb5aa370c5ecf5c53c6a4e60",
-  // },
-];
-
-export const bscTestRpcList = [
   {
     isWorking: true,
-    rpc: "https://bsc-testnet.publicnode.com",
-    wsRpc: "https://bsc-testnet.publicnode.com",
+    rpc: "https://1rpc.io/mantle",
+    wsRpc: "",
+  },
+];
+
+export const polygonRpcList = [
+  {
+    isWorking: true,
+    rpc: "https://polygon.llamarpc.com",
+    wsRpc: "",
   },
   {
     isWorking: true,
-    rpc: "https://nd-770-355-595.p2pify.com/5c7f993c378c112316696893e7101306",
-    wsRpc:
-      "wss://ws-nd-770-355-595.p2pify.com/5c7f993c378c112316696893e7101306",
+    rpc: "https://1rpc.io/matic",
+    wsRpc: "",
   },
 ];

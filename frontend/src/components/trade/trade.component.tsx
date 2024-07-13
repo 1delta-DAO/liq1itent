@@ -33,6 +33,8 @@ interface TradeProps {
   getWeb3Provider: (chainId: number) => Promise<Web3<RegisteredSubscription> | undefined>;
 }
 
+const defaultSettlementAddress = ''
+
 export const TradeComponent: FunctionComponent<TradeProps> = (
   props: TradeProps
 ) => {
@@ -42,7 +44,6 @@ export const TradeComponent: FunctionComponent<TradeProps> = (
   const [provider, setProvider] = useState<Web3<RegisteredSubscription> | undefined>(undefined);
 
   const [input, setInput] = useState("0");
-  const [projectedAddress, setProjectedAddress] = useState("");
   const [amountApproved, setAmountApproved] = useState("0");
   const { account } = useWeb3React<JsonRpcProvider>();
   const { approveTokenTo, getAmountApprovedFor } = useApprove();
@@ -82,12 +83,12 @@ export const TradeComponent: FunctionComponent<TradeProps> = (
       if (
         selectedTokenIndex &&
         account &&
-        projectedAddress &&
+        defaultSettlementAddress &&
         tokens[selectedTokenIndex]
       ) {
         const amount = await getAmountApprovedFor(
           account,
-          projectedAddress,
+          defaultSettlementAddress,
           tokens[selectedTokenIndex]!.value
         );
         setAmountApproved(amount);
@@ -95,7 +96,7 @@ export const TradeComponent: FunctionComponent<TradeProps> = (
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, selectedTokenIndex, getAmountApprovedFor, projectedAddress]);
+  }, [account, selectedTokenIndex, getAmountApprovedFor, defaultSettlementAddress]);
 
 
   const onTokenChange = (option: number): void => {
@@ -111,10 +112,10 @@ export const TradeComponent: FunctionComponent<TradeProps> = (
 
 
   const onActionButtonClickedApprove = (): void => {
-    if (projectedAddress) {
+    if (defaultSettlementAddress) {
       approveTokenTo(
         ethers.constants.MaxUint256.toString(),
-        projectedAddress,
+        defaultSettlementAddress,
         tokens[selectedTokenIndex]!.value
       );
     }

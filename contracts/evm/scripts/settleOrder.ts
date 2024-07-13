@@ -40,12 +40,7 @@ async function main() {
     try {
         ;[nativeFee] = await settlement.quote.staticCall(ENDPOINT_IDS[ChainId.MANTLE], testMessage, options, false)
     } catch (e: any) {
-        console.log(Object.keys(e))
         console.log(e.data)
-        console.log(e.code)
-        console.log(e.name)
-        console.log(e._stack)
-        console.log(e.parent)
     }
     console.log("settle with fee", nativeFee)
     // swapper signs order on origin chai

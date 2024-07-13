@@ -1,5 +1,10 @@
 import { ChainId } from "../model/chains.enum";
-import { mainnetRpcList, sepoliaRpcList } from "./rpc-list";
+import {
+  mainnetRpcList,
+  mantleRpcList,
+  polygonRpcList,
+  sepoliaRpcList,
+} from "./rpc-list";
 import { ethers } from "ethers";
 
 export const findWorkingRpc = async (
@@ -56,7 +61,7 @@ export const blockchainsConfig: BlockchainsConfig = {
   [ChainId.mantle]: {
     settlementAddress: "0x1d051eeD29Df13E1A1d1546329E54036A57AEb77",
     fillerOracleAddress: "",
-    rpcs: sepoliaRpcList,
+    rpcs: mantleRpcList,
     explorerUrl: "https://explorer.mantle.xyz/api",
     explorerApiKey: "IN9UA3RUEADNEE3IIF9IB1WJ7W6AT4VTC7",
   },
@@ -70,7 +75,7 @@ export const blockchainsConfig: BlockchainsConfig = {
   [ChainId.polygon]: {
     settlementAddress: "0x1a44076050125825900e736c501f859c50fE728c",
     fillerOracleAddress: "",
-    rpcs: sepoliaRpcList,
+    rpcs: polygonRpcList,
     explorerUrl: "https://api.etherscan.io/api",
     explorerApiKey: "IN9UA3RUEADNEE3IIF9IB1WJ7W6AT4VTC7",
   },
