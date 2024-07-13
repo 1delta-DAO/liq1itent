@@ -1,9 +1,6 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from "typeorm";
-
-enum WalletType {
-  EVM = "EVM",
-  SOL = "SOL",
-}
+import { WalletType } from "./wallet-type.enum";
+import { OrderStatus } from "./order-status.enum";
 
 @Entity({ name: "order" })
 export class OrderEntity extends BaseEntity {
@@ -18,6 +15,9 @@ export class OrderEntity extends BaseEntity {
 
   @Column({ name: "swapper_wallet_type" })
   swapperWalletType: WalletType;
+
+  @Column({ name: "status" })
+  status: OrderStatus;
 
   @Column({ name: "nonce" })
   nonce: number;

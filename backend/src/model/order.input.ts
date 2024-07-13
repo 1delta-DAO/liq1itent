@@ -1,10 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Length } from "class-validator";
-
-enum WalletType {
-  EVM = "EVM",
-  SOL = "SOL",
-}
+import { WalletType } from "./wallet-type.enum";
+import { OrderStatus } from "./order-status.enum";
 
 export class OrderInput {
   @Length(32, 44)
@@ -29,6 +26,13 @@ export class OrderInput {
     required: true,
   })
   swapperWalletType: WalletType;
+
+  @ApiProperty({
+    type: String,
+    example: OrderStatus.NEW,
+    required: true,
+  })
+  status: OrderStatus;
 
   @ApiProperty({
     type: Number,
