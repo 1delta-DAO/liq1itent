@@ -1,9 +1,6 @@
 /* eslint-disable */
 import React from "react";
 import { HeaderComponent } from "../header/Header.component";
-import { TabContainer } from "../tab-container/TabContainer.component";
-import { tabs } from "../../data/tabs";
-import { useMenu } from "../menu/useMenu";
 
 import { useEffect, useState } from "react";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
@@ -16,9 +13,9 @@ import Web3 from "web3";
 
 import EthereumRPC from "../../RPC/ethRPC-web3"; // for using web3.js 
 import SolanaRPC from "../../RPC/solanaRPC"; // for using solana
+import { TradeComponent } from "../trade/trade.component";
 
 export const AppComponent = (): JSX.Element => {
-  const { selectedTab } = useMenu();
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
@@ -53,7 +50,7 @@ export const AppComponent = (): JSX.Element => {
       return;
     }
     // EVM chains
-    const polygon_address = await getPolygonAddress();
+    //const polygon_address = await getPolygonAddress();
     const bnb_address = await getBnbAddress();
     
     const rpcETH = new EthereumRPC(provider);
@@ -64,7 +61,7 @@ export const AppComponent = (): JSX.Element => {
     let solana_address = await solanaRPC.getAccounts();
 
     uiConsole(
-      "Polygon Address: " + polygon_address,
+      //"Polygon Address: " + polygon_address,
       "BNB Address: " + bnb_address,
       "Solana Address: " + solana_address,
     );
@@ -165,7 +162,7 @@ export const AppComponent = (): JSX.Element => {
     uiConsole(signedMessage);
   };
 
-  const getPolygonAddress = async () => {
+  const getWeb3Provider = async (chainId: number) => {
     if (!provider) {
       uiConsole("provider not initialized yet");
       return;
@@ -173,24 +170,43 @@ export const AppComponent = (): JSX.Element => {
     const rpc = new EthereumRPC(provider);
     const privateKey = await rpc.getPrivateKey();
 
-    const polygonPrivateKeyProvider = new EthereumPrivateKeyProvider({
-      config: {
-        chainConfig: {
-          chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: "0x13882",
-          rpcTarget: "https://rpc.ankr.com/polygon_amoy",
-          displayName: "Polygon Amoy Testnet",
-          blockExplorerUrl: "https://amoy.polygonscan.com",
-          ticker: "MATIC",
-          tickerName: "MATIC",
-          logo: "https://cryptologos.cc/logos/polygon-matic-logo.png",
+    if (chainId == 5000) {
+      const polygonPrivateKeyProvider = new EthereumPrivateKeyProvider({
+        config: {
+          chainConfig: {
+            chainNamespace: CHAIN_NAMESPACES.EIP155,
+            chainId: "0x1388",
+            rpcTarget: "https://mantle.drpc.org",
+            displayName: "Mantle",
+            blockExplorerUrl: "",
+            ticker: "MNT",
+            tickerName: "MNT",
+            logo: "",
+          },
         },
-      },
-    });
-    await polygonPrivateKeyProvider.setupProvider(privateKey);
-    const web3 = new Web3(polygonPrivateKeyProvider);
-    const address = (await web3.eth.getAccounts())[0];
-    return address;
+      });
+      await polygonPrivateKeyProvider.setupProvider(privateKey);
+      const web3 = new Web3(polygonPrivateKeyProvider);
+      return web3;
+    } else {
+      const polygonPrivateKeyProvider = new EthereumPrivateKeyProvider({
+        config: {
+          chainConfig: {
+            chainNamespace: CHAIN_NAMESPACES.EIP155,
+            chainId: "0x13882",
+            rpcTarget: "https://rpc.ankr.com/polygon_amoy",
+            displayName: "Polygon Amoy Testnet",
+            blockExplorerUrl: "https://amoy.polygonscan.com",
+            ticker: "MATIC",
+            tickerName: "MATIC",
+            logo: "https://cryptologos.cc/logos/polygon-matic-logo.png",
+          },
+        },
+      });
+      await polygonPrivateKeyProvider.setupProvider(privateKey);
+      const web3 = new Web3(polygonPrivateKeyProvider);
+      return web3;
+    }
   };
 
   const getBnbAddress = async () => {
@@ -231,7 +247,7 @@ export const AppComponent = (): JSX.Element => {
   return (
     <main>
       <HeaderComponent title="Liqu1tent" subTitle="by 1delta" login={login} logout={logout} loggedIn={loggedIn} />
-      <TabContainer selectedTab={selectedTab} tabs={tabs} />
+      <TradeComponent getWeb3Provider={getWeb3Provider} />
     </main>
   );
 };

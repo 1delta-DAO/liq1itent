@@ -4,7 +4,6 @@ import { ToastContainer } from "react-toastify";
 import { BrowserRouter } from "react-router-dom";
 import { ModalProvider } from "./components/modal/Modal.component";
 import { AppComponent } from "./components/app/App.component";
-import { MenuProvider } from "./components/menu/useMenu";
 import "react-toastify/dist/ReactToastify.css";
 import "../public/assets/styles/styles.scss";
 
@@ -13,11 +12,9 @@ const root = createRoot(container!);
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <MenuProvider>
-        <ModalProvider>
-          <AppComponent />
-        </ModalProvider>
-      </MenuProvider>
+      <ModalProvider>
+        <AppComponent />
+      </ModalProvider>
       <ToastContainer />
     </BrowserRouter>
   </React.StrictMode>

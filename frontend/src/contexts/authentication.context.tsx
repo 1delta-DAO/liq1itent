@@ -16,8 +16,6 @@ import {
   ConnectorNames,
   connectors,
 } from "../components/modal/modals/connect/connectors";
-import { useMenu } from "../components/menu/useMenu";
-import { TabKeys } from "../data/tabs";
 
 interface AuthenticationContextValue {
   login: (connectorName: ConnectorNames) => void;
@@ -41,18 +39,16 @@ export const AuthenticationProvider: React.FC<LpStakingProviderProps> = (
   props: LpStakingProviderProps
 ) => {
   const { library, activate, deactivate } = useWeb3React<Web3Provider>();
-  const { onTabSelected } = useMenu();
 
   if (library) {
     library.pollingInterval = 6000;
   }
 
   const logout = useCallback(() => {
-    onTabSelected(TabKeys.Swap);
     console.log(`Logging out`);
     localStorage.removeItem(connectorNameStorageKey);
     deactivate();
-  }, [deactivate, onTabSelected]);
+  }, [deactivate]);
 
   const login = useCallback(
     (connectorName: ConnectorNames) => {
