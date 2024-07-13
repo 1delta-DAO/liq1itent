@@ -1,0 +1,97 @@
+@import "../../../public/assets/styles/_variables/colors";
+@import "../../../public/assets/styles/_variables/breakpoints";
+@import "../../../public/assets/styles/_variables/_sizes";
+
+.information {
+  position: relative;
+  margin-top: $tab-double;
+  margin-bottom: $tab-double;
+
+  .column {
+    display: flex;
+    flex-direction: row;
+
+    .header {
+      display: flex;
+      position: relative;
+      margin-bottom: $tab;
+      align-items: center;
+      h2 {
+        font-family: "Inter", sans-serif;
+        font-size: $section-title-font-size;
+        color: $white;
+      }
+
+      .icon-wrapper {
+        display: flex;
+        width: $header-logo-size;
+        margin-right: $header-logo-spacing;
+        justify-content: center;
+        .icon {
+          height: $section-title-icon-size;
+          width: $section-title-icon-size;
+        }
+      }
+    }
+
+    .about-text {
+      position: relative;
+      font-family: "Inter", sans-serif;
+      color: $silver;
+      text-align: justify;
+      font-size: $section-text-font-size;
+      margin-left: $header-logo-size + $header-logo-spacing;
+      margin-right: $header-logo-size + $header-logo-spacing;
+    }
+
+    @media all and (max-width: $mobile-large) {
+      margin-bottom: $tab-mobile-large;
+      .header {
+        h2 {
+          font-size: $section-title-font-size-mobile-large;
+        }
+        .icon-wrapper {
+          width: $header-logo-size-mobile-large;
+          margin-right: $header-logo-spacing-mobile-large;
+          .icon {
+            height: $section-title-font-size-mobile-large;
+            width: $section-title-font-size-mobile-large;
+          }
+        }
+      }
+
+      .about-text {
+        font-size: $section-text-font-size-mobile-large;
+        margin-left: $header-logo-size-mobile-large +
+          $header-logo-spacing-mobile-large;
+        margin-right: $header-logo-size-mobile-large +
+          $header-logo-spacing-mobile-large;
+      }
+    }
+
+    @media all and (max-width: $mobile-small) {
+      margin-bottom: $tab-mobile-small;
+      .header {
+        h2 {
+          font-size: $section-title-font-size-mobile-small;
+        }
+        .icon-wrapper {
+          width: $header-logo-size-mobile-small;
+          margin-right: $header-logo-spacing-mobile-small;
+          .icon {
+            height: $section-title-icon-size-mobile-small;
+            width: $section-title-icon-size-mobile-small;
+          }
+        }
+      }
+
+      .about-text {
+        font-size: $section-text-font-size-mobile-small;
+        margin-left: $header-logo-size-mobile-small +
+          $header-logo-spacing-mobile-small;
+        margin-right: $header-logo-size-mobile-small +
+          $header-logo-spacing-mobile-small;
+      }
+    }
+  }
+}

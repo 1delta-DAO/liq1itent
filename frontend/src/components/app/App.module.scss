@@ -1,0 +1,8 @@
+@import "../../../public/assets/styles/_variables/colors";
+@import "../../../public/assets/styles/_variables/breakpoints";
+
+main {
+  @media all and (max-width: $mobile-large) {
+    width: 100vw !important;
+  }
+}

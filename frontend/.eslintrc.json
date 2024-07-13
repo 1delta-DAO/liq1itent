@@ -1,0 +1,88 @@
+/*
+  Rules Severity
+    - 0 = off
+    - 1 = warn
+    - 2 = error
+*/
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "jest": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:jsx-a11y/recommended",
+    "plugin:react/recommended",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "impliedStrict": true
+    },
+    "ecmaVersion": 2018,
+    "project": "./tsconfig.json",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "jsx-a11y",
+    "react",
+    "react-hooks",
+    "eslint-plugin-prettier"
+  ],
+  "rules": {
+    // Javscript Specific Rules That Are Applied To Typescript Too
+    "max-len": [
+      "error",
+      {
+        "code": 105,
+        "ignorePattern": "^import"
+      }
+    ],
+    "no-console": 1,
+    "no-debugger": 1,
+    "semi": 2,
+    // React Specific Rules
+    "react/display-name": 2,
+    // React Hooks Specific Rules
+    "react-hooks/rules-of-hooks": 2,
+    "react-hooks/exhaustive-deps": 2,
+    "react/prop-types": 2,
+    // Typescript Specific Rules From This Point On
+    "@typescript-eslint/explicit-function-return-type": 2,
+    "@typescript-eslint/no-explicit-any": 2,
+    "@typescript-eslint/no-inferrable-types": 2,
+    "@typescript-eslint/no-non-null-assertion": 0,
+    "@typescript-eslint/no-unsafe-call": 2,
+    "@typescript-eslint/no-unsafe-member-access": 2,
+    "@typescript-eslint/no-unused-vars": [
+      1,
+      {
+        "argsIgnorePattern": "_",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "@typescript-eslint/no-var-requires": 2,
+    "@typescript-eslint/require-await": 2,
+    "prettier/prettier": [
+      "off",
+      {
+        "endOfLine": "auto",
+        "printWidth": 100,
+        "singleQuote": false,
+        "tabWidth": 2
+      }
+    ]
+  },
+  "settings": {
+    "react": {
+      "pragma": "React",
+      "version": "detect"
+    }
+  }
+}

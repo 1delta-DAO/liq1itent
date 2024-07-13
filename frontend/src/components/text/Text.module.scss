@@ -1,0 +1,71 @@
+@import "../../../public/assets/styles/_variables/colors";
+@import "../../../public/assets/styles/_variables/breakpoints";
+@import "../../../public/assets/styles/_variables/_sizes";
+
+.text {
+  position: relative;
+  margin-bottom: $tab-quadruple;
+
+  .column {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: $tab;
+
+    .header {
+      position: relative;
+      h2 {
+        margin-left: $header-logo-size + $header-logo-spacing;
+        font-family: "Inter", sans-serif;
+        font-size: $section-title-font-size;
+        color: $white;
+      }
+    }
+    .about-text {
+      position: relative;
+      font-family: "Inter", sans-serif;
+      color: $silver;
+      text-align: justify;
+      font-size: $section-text-font-size;
+      margin-left: $header-logo-size + $header-logo-spacing;
+      margin-right: $header-logo-size + $header-logo-spacing;
+    }
+
+    @media all and (max-width: $mobile-large) {
+      margin-bottom: $tab-mobile-large;
+      .header {
+        h2 {
+          margin-left: $header-logo-size-mobile-large +
+            $header-logo-spacing-mobile-large;
+          font-size: $section-title-font-size-mobile-large;
+        }
+      }
+
+      .about-text {
+        margin-left: $header-logo-size-mobile-large +
+          $header-logo-spacing-mobile-large;
+        margin-right: $header-logo-size-mobile-large +
+          $header-logo-spacing-mobile-large;
+        font-size: $section-text-font-size-mobile-large;
+      }
+    }
+
+    @media all and (max-width: $mobile-small) {
+      margin-bottom: $tab-mobile-small;
+      .header {
+        h2 {
+          margin-left: $header-logo-size-mobile-small +
+            $header-logo-spacing-mobile-small;
+          font-size: $section-title-font-size-mobile-small;
+        }
+      }
+
+      .about-text {
+        margin-left: $header-logo-size-mobile-small +
+          $header-logo-spacing-mobile-small;
+        margin-right: $header-logo-size-mobile-small +
+          $header-logo-spacing-mobile-small;
+        font-size: $section-text-font-size-mobile-small;
+      }
+    }
+  }
+}

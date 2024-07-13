@@ -1,0 +1,51 @@
+@import "../../../../public/assets/styles/_variables/colors";
+@import "../../../../public/assets/styles/_variables/breakpoints";
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .dropdown-item {
+    height: 3rem;
+    align-items: center;
+    color: transparentize($white, 0.66);
+    display: flex;
+    margin-bottom: 1.8rem;
+
+    .toggle {
+      margin-left: auto;
+      &:hover {
+        color: $white;
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    img {
+      height: 1.8rem;
+      object-fit: contain;
+      margin-right: 1rem;
+      width: 1.8rem;
+    }
+
+    input {
+      background-color: transparent;
+      border: solid 0.1rem transparentize($white, 0.5);
+      border-radius: 2.5rem;
+      outline: 0;
+      padding: 0.8rem 5rem 0.8rem 1.6rem;
+      transition: all 0.4s ease-in;
+      &:hover {
+        box-shadow: 0 0 4px 4px transparentize($white, 0.85);
+        border: solid 0.1rem transparentize($white, 0.2);
+      }
+
+      @media all and (max-width: $mobile-medium) {
+        width: 100%;
+      }
+    }
+  }
+}

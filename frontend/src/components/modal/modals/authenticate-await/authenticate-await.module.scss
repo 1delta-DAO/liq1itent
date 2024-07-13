@@ -1,0 +1,13 @@
+@import "../../../../../public/assets/styles/_variables/breakpoints";
+@import "../../../../../public/assets/styles/_variables/colors";
+
+.authenticate-await {
+  padding: 0 2.2rem;
+  min-width: 580px;
+  padding-bottom: 2.2rem;
+
+  @media all and (max-width: $mobile-small) {
+    min-width: 0px;
+    width: 100%;
+  }
+}

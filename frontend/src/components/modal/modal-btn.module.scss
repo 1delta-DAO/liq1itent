@@ -1,0 +1,52 @@
+@import "../../../public/assets/styles/_variables/breakpoints";
+@import "../../../public/assets/styles/_variables/colors";
+@import "../../../public/assets/styles/_variables/_sizes";
+
+.modal-btn {
+  margin: 0 2rem;
+  width: 100%;
+
+  &.disabled {
+    > button {
+      background: transparent $gradient-3 0 0 no-repeat;
+      border: solid 0.1rem transparentize($gold-dark, 0.5);
+      color: transparentize($slate, 0.5);
+      cursor: not-allowed;
+      &:hover {
+        background: transparent $gradient-3 0 0 no-repeat;
+        border: solid 0.1rem transparentize($gold-dark, 0.5);
+        color: transparentize($slate, 0.5);
+      }
+    }
+  }
+
+  > button {
+    background: transparent $gradient-3 0 0 no-repeat;
+    border: solid 0.1rem $gold;
+    color: #fff;
+    justify-content: center;
+    width: 100%;
+    letter-spacing: 1;
+    text-transform: uppercase;
+    z-index: 3;
+    transition: all 0.4s ease-in;
+
+    &:hover {
+      border: solid 0.2rem $gold-light;
+      color: $main-dark;
+      background: #ffffffcc;
+    }
+  }
+
+  @media all and (max-width: $mobile-small) {
+    button {
+      height: 5rem;
+    }
+  }
+
+  @media all and (max-width: $mobile-small) {
+    button {
+      height: 4rem;
+    }
+  }
+}

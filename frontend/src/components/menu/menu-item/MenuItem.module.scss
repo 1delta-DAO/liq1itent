@@ -1,0 +1,154 @@
+@import "../../../../public/assets/styles/_variables/colors";
+@import "../../../../public/assets/styles/_variables/breakpoints";
+@import "../../../../public/assets/styles/_variables/_sizes";
+
+.menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: $tab-double;
+  transition: 0.25s all ease-in-out;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover {
+    transition: all 0.4s ease-in;
+    .button-col {
+      color: $white;
+      text-shadow: $text-glow;
+    }
+    &.disabled {
+      box-shadow: 0 0 0 0;
+      border: solid 0rem;
+    }
+  }
+
+  &.menu-item-active {
+    transition: all 0.4s ease-in;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  button {
+    background-color: transparent;
+    letter-spacing: 1;
+    line-height: 4.8rem;
+    padding: 0rem;
+    text-transform: uppercase;
+    border: none;
+    text-shadow: none;
+    &:hover {
+      color: $white;
+      text-shadow: $text-glow;
+    }
+
+    &.disabled {
+      color: transparentize($white, 0.8);
+      cursor: initial;
+      @media all and (min-width: $mobile-medium) {
+        border: none !important;
+      }
+
+      &:hover {
+        transition: all 0.4s ease-in;
+        box-shadow: none;
+        border: none !important;
+      }
+    }
+  }
+}
+
+@media all and (max-width: $mobile-large) {
+  .menu-item {
+    padding: 0;
+    margin-bottom: 3rem;
+    margin-right: 0;
+    margin-left: 0;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    justify-content: center;
+
+    &:hover {
+      border: none;
+      box-shadow: none;
+    }
+
+    &.menu-item-active {
+      border: none;
+      box-shadow: 0 0 0 0;
+    }
+
+    &.disabled {
+      & > div > div:first-child {
+        border: solid 0.1rem transparentize($white, 0.7) !important;
+      }
+    }
+
+    & > div {
+      width: 70%;
+      flex-direction: column;
+      align-items: flex-start;
+
+      &:focus {
+        outline: none;
+      }
+
+      & > div:first-child {
+        justify-content: center;
+        width: 100%;
+        height: 5rem;
+        padding: 0;
+        border: solid 0.1rem transparentize($white, 0.2);
+
+        button {
+          text-align: center;
+        }
+
+        div {
+          width: unset;
+        }
+      }
+
+      & > div:last-child {
+        position: relative;
+        margin-top: 1rem;
+        height: unset !important;
+        border: solid 0.1rem transparentize($white, 0.2);
+      }
+    }
+
+    & > button {
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &[role="menuitem"] {
+      width: 70%;
+      align-self: center;
+      border: solid 0.1rem transparentize($white, 0.2) !important;
+      border-radius: 2.5rem;
+
+      &.disabled {
+        border: solid 0.1rem transparentize($white, 0.7) !important;
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+    & > span {
+      margin-left: 0 !important;
+    }
+  }
+}

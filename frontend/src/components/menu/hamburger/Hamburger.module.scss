@@ -1,0 +1,73 @@
+@import "../../../../public/assets/styles/_variables/colors";
+@import "../../../../public/assets/styles/_variables/breakpoints";
+
+.hamburger {
+  cursor: pointer;
+  display: none;
+  z-index: 15;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@media all and (max-width: $mobile-large) {
+  .hamburger {
+    display: block;
+    position: absolute;
+    margin-left: 48px;
+    right: 1.5rem;
+
+    .bar {
+      background-color: $white;
+      height: 0.5rem;
+      width: 3.5rem;
+      margin: 0.6rem 0;
+      transition: 0.4s;
+    }
+
+    &.animate {
+      .bar {
+        &:nth-child(1) {
+          transform: rotate(45deg) translate(0.8rem, 0.7rem);
+        }
+
+        &:nth-child(2) {
+          opacity: 0;
+        }
+
+        &:nth-child(3) {
+          transform: rotate(-45deg) translate(0.8rem, -0.8rem);
+        }
+      }
+    }
+  }
+}
+
+@media all and (max-width: $mobile-small) {
+  .hamburger {
+    display: inline-block;
+    right: 1rem;
+    &.animate {
+      .bar {
+        &:nth-child(1) {
+          transform: rotate(45deg) translate(1.7vw, 1.4vw);
+        }
+        &:nth-child(2) {
+          opacity: 0;
+        }
+        &:nth-child(3) {
+          transform: rotate(-45deg) translate(1.7vw, -1.6vw);
+        }
+      }
+    }
+
+    .bar {
+      background-color: $white;
+      height: 1vw;
+      width: 7vw;
+      margin: 1.2vw;
+      transition: 0.4s;
+    }
+  }
+}

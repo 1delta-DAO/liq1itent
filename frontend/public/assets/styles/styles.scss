@@ -1,0 +1,73 @@
+@import "./_variables/colors";
+@import "./_variables/breakpoints";
+@import "./_variables/font";
+
+$header-size: 5rem;
+
+html {
+  background: $main-darker;
+  font-size: 66%;
+  min-height: 100%;
+  // overflow-x: hidden;
+  background: -moz-linear-gradient(
+    top,
+    $main-darkest 0%,
+    $main-medium 100%
+  ); /* FF3.6-15 */
+  background: -webkit-linear-gradient(
+    top,
+    $main-darkest 0%,
+    $main-medium 100%
+  ); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(
+    to bottom,
+    $main-darkest 0%,
+    $main-medium 100%
+  ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  background-attachment: fixed;
+}
+
+body {
+  // background-size: cover;
+  // overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+  color: $emperor;
+  font-family: Inter, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  //overflow: hidden;
+
+  #mainCanvas {
+    position: fixed;
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1000;
+  }
+}
+
+main {
+  margin: 0 auto;
+  max-width: 132rem;
+  padding: 0 2.5rem;
+  width: 100%;
+  height: calc(100% - 2.5rem);
+  display: flex;
+  flex-flow: column;
+  @media all and (max-width: $mobile-large) {
+    padding: 0 1.5rem;
+  }
+  @media all and (max-width: $mobile-small) {
+    padding: 0 1rem;
+  }
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}

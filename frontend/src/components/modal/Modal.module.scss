@@ -1,0 +1,115 @@
+@import "../../../public/assets/styles/_variables/colors";
+@import "../../../public/assets/styles/_variables/breakpoints";
+@import "../../../public/assets/styles/_variables/_sizes";
+
+.modal {
+  align-items: center;
+  background-color: rgba($main-darkest, 0.9);
+  display: flex;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  left: 0;
+  padding: 2rem;
+  position: fixed;
+  top: 0;
+  z-index: 9998;
+
+  overflow: hidden;
+
+  .modal-background {
+    position: absolute;
+    min-width: 740px;
+    z-index: -2;
+
+    @media all and (max-width: $mobile-small) {
+      min-width: 0;
+      width: 100%;
+    }
+
+    svg {
+      @media all and (max-width: $mobile-large) {
+        width: 100%;
+      }
+      path {
+        transition: all 0.3s linear;
+        &:hover {
+          fill: $main-lightestest;
+        }
+        &:active {
+          fill: $gold-dark;
+        }
+      }
+    }
+
+    .glow {
+      position: absolute;
+      box-shadow: 0 0 16px $gold-semi-transparent;
+      width: calc(100% - 10px);
+      height: calc(100% - 10px);
+      margin: 5px;
+    }
+  }
+
+  .modal-content {
+    border-radius: 3.2rem;
+    color: transparentize($white, 0.5);
+    padding: 2rem;
+
+    @media all and (max-width: $mobile-small) {
+      width: 100%;
+    }
+
+    .modal-header {
+      align-items: center;
+      padding: 2.2rem 2rem;
+      color: $white;
+      display: flex;
+      font-size: $card-sub-title-font-size;
+      font-family: Inter, sans-serif;
+      margin-bottom: 3rem;
+
+      @media all and (max-width: $mobile-large) {
+        justify-content: space-between;
+        font-size: $card-sub-title-font-size-mobile-large;
+        padding: 1.8rem 1.8rem;
+        margin-bottom: 2.4rem;
+      }
+
+      @media all and (max-width: $mobile-small) {
+        justify-content: space-between;
+        font-size: $card-sub-title-font-size-mobile-small;
+        padding: 3.6vw 1.6vw;
+        margin-bottom: 1.4rem;
+      }
+
+      .modal-body {
+        font-size: 2.4rem;
+        padding-top: 3.2rem;
+      }
+
+      .modal-close {
+        background-color: transparent;
+        cursor: pointer;
+        height: auto;
+        margin-left: auto;
+        padding-left: 0;
+        padding-right: 0;
+
+        img {
+          height: 1.2rem;
+          margin: 0 auto;
+          opacity: 0.33;
+          transition: 0.2s opacity ease-in-out;
+          width: 1.2rem;
+        }
+
+        &:hover {
+          img {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+}

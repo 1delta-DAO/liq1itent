@@ -1,0 +1,43 @@
+@import "../../../public/assets/styles/_variables/colors";
+
+.loader,
+.loader:before,
+.loader:after {
+  box-sizing: border-box;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.loader.simple-circle {
+  animation: 2s circle-loader infinite linear;
+  border: 0.4rem solid $soap;
+  border-right-color: $main-lightish;
+  border-bottom-color: $main-lightish;
+  transform-origin: center center;
+}
+
+.loader.simple-circle {
+  border-radius: 50%;
+  height: 3rem;
+  margin: 0.25rem auto;
+  width: 3rem;
+
+  &.small {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &.large {
+    width: 6rem;
+    height: 6rem;
+  }
+}
+
+@keyframes circle-loader {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
