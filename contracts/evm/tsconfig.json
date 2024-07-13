@@ -21,7 +21,8 @@
   "include": [
     "test",
     "utils",
-    "scripts"
+    "scripts",
+    "scripts/painful"
   ],
   "files": [
     "hardhat.config.ts"
