@@ -6,7 +6,7 @@ import { useTxWaitModal } from "../components/modal/modals/tx-wait/tx-wait.modal
 
 import { extractRevertReason, JsonRpcError } from "../utils/blockchain";
 import { approve, getAllowance } from "../contracts/erc20.contract";
-import { useUserPositions } from "./useUserPositions";
+
 
 interface UseApprove {
   approveTokenTo: (
@@ -24,7 +24,6 @@ interface UseApprove {
 export const useApprove = (): UseApprove => {
   const { library, account } = useWeb3React<JsonRpcProvider>();
   const txAwaitModal = useTxWaitModal();
-  const { refresh } = useUserPositions();
 
   const approveTokenTo = (
     amount: string,
@@ -50,7 +49,6 @@ export const useApprove = (): UseApprove => {
         txAwaitModal.showModal();
         await tx.wait(1);
         txAwaitModal.closeModal();
-        refresh();
       }).catch((error: JsonRpcError | { error: JsonRpcError }) => {
         const err =
           (error as { error: JsonRpcError }).error !== undefined
@@ -60,7 +58,7 @@ export const useApprove = (): UseApprove => {
         console.log(extractRevertReason(err));
       });
     },
-    [txAwaitModal, refresh]
+    [txAwaitModal]
   );
 
   return { approveTokenTo, getAmountApprovedFor };
