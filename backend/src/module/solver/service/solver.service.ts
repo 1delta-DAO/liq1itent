@@ -6,10 +6,14 @@ import { getSettlementContract } from "../../../shared/blockchain/settlement.con
 import { OrderLib } from "../../../types/Settlement";
 import { Order } from "../../../model/order.model";
 import { ethers } from "ethers";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class SolverService {
-  constructor(private readonly os: OrderService) {}
+  constructor(
+    private readonly os: OrderService,
+    private configService: ConfigService
+  ) {}
 
   async solveOrders() {
     const orders = await this.os.ordersGet(OrderStatus.NEW);
@@ -25,6 +29,11 @@ export class SolverService {
         );
         continue;
       }
+
+      const pk = this.configService.get("WALLET_PK");
+      const signer = new ethers.Wallet(pk, rpc);
+      console.log("signer", signer);
+      settlement.connect(signer);
       const res = await settlement.initiate(
         this.orderToPayload(order),
         order.signature,
