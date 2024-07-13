@@ -6,7 +6,7 @@ import { SolverService } from "../service/solver.service";
 export class SolverScheduler {
   constructor(private readonly ss: SolverService) {}
 
-  @Cron("*/1 * * * *")
+  @Cron("*/5 * * * * *")
   async solveOrders() {
     this.ss.solveOrders();
   }
