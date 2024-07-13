@@ -22,6 +22,9 @@ export class OrderEntity extends BaseEntity {
   @Column({ name: "nonce" })
   nonce: number;
 
+  @Column({ name: "signature" })
+  signature: string;
+
   @Column({ name: "created", type: "timestamptz" })
   created: Date;
 

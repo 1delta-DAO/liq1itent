@@ -2,6 +2,7 @@ node_modules
 artifacts
 cache
 /types
+contracts/evm/types
 abi
 .env
 yarn-error.log

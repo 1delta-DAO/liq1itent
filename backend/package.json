@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "type": "typechain --target ethers-v5 --out-dir src/abi/types \"./src/abi/**/*.json\""
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.2",
@@ -29,17 +30,21 @@
     "@nestjs/schematics": "^10.1.1",
     "@nestjs/swagger": "^7.3.0",
     "@nestjs/typeorm": "^10.0.2",
+    "@typechain/ethers-v5": "^11.1.2",
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "ethers": "^5.7.2",
     "express-rate-limit": "^7.2.0",
+    "hardhat": "2.22.6",
     "helmet": "^7.1.0",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.2.1",
     "rimraf": "^5.0.5",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.0",
+    "typechain": "^8.3.2",
     "typeorm": "^0.3.20",
     "ws": "^8.16.0"
   },
