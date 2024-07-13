@@ -1,5 +1,6 @@
 // hardhat.config.ts
 
+
 import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from 'dotenv';
 import "hardhat-contract-sizer";
@@ -71,7 +72,7 @@ const config: HardhatUserConfig = {
     matic: {
       // url: 'https://matic-mainnet.chainstacklabs.com',
       // url: 'https://rpc-mainnet.maticvigil.com',
-      url: 'https://rpc.ankr.com/polygon',
+      url: 'https://1rpc.io/matic',
       // url:  `https://polygon-mainnet.public.blastapi.io`,
       accounts: [pk],
       chainId: 137,
@@ -143,10 +144,10 @@ const config: HardhatUserConfig = {
     ],
     overrides: {}
   },
-  typechain: {
-    outDir: 'types',
-    target: 'ethers-v6',
-  },
+  // typechain: {
+  //   outDir: 'types',
+  //   target: 'ethers-v6',
+  // },
 };
 
 export default config;

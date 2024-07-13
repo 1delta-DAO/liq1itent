@@ -83,6 +83,7 @@
   },
   "dependencies": {
     "@layerzerolabs/lz-v2-utilities": "^2.3.29",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
     "solidity-bytes-utils": "^0.8.2"
   }
 }
