@@ -1,65 +1,62 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
-import { ContractTransaction } from "ethers";
-import { useCallback } from "react";
 import { useTxWaitModal } from "../components/modal/modals/tx-wait/tx-wait.modal";
+import {
+  CrossChainOrder,
+  getHash,
+  getOrder,
+  padAddress
+} from "../utils/order";
+import { getPackedSig } from "../utils/signature_utils";
 
-import { extractRevertReason, JsonRpcError } from "../utils/blockchain";
-import { approve, getAllowance } from "../contracts/erc20.contract";
-
-
-interface UseApprove {
-  approveTokenTo: (
-    amount: string,
-    spenderAddress: string,
-    tokenAddress: string
-  ) => void;
-  getAmountApprovedFor: (
-    userAddress: string,
-    spenderAddress: string,
-    tokenAddress: string
+interface UseSignOrder {
+  signOrder: (
+    order: CrossChainOrder
   ) => Promise<string>;
+  constructOrder: (
+    userAddress: string,
+    amountIn: string,
+    amountOut: string,
+    assetIn: string,
+    assetOut: string,
+    chainIdIn: string,
+    chainIdOut: string
+  ) => CrossChainOrder;
 }
 
-export const useSignOrder = (): UseApprove => {
+export const useSignOrder = (): UseSignOrder => {
   const { library, account } = useWeb3React<JsonRpcProvider>();
   const txAwaitModal = useTxWaitModal();
 
-  const approveTokenTo = (
-    amount: string,
-    spenderAddress: string,
-    tokenAddress: string
-  ): void => {
+  async function signOrder(
+    order: CrossChainOrder
+  ): Promise<string> {
     if (library) {
-      txAwait(approve(amount, spenderAddress, tokenAddress, library));
+      const hash = getHash(order)
+      return await getPackedSig(hash, library)
     }
+    return '0x'
   };
 
-  const getAmountApprovedFor = (
+  const constructOrder = (
     userAddress: string,
-    spenderAddress: string,
-    tokenAddress: string
-  ): Promise<string> => {
-    return getAllowance(userAddress, spenderAddress, tokenAddress);
+    amountIn: string,
+    amountOut: string,
+    assetIn: string,
+    assetOut: string,
+    chainIdIn: string, // we hard code that
+    chainIdOut: string
+  ): CrossChainOrder => {
+    return getOrder({
+      swapper: padAddress(userAddress),
+      originAmount: BigInt(amountIn),
+      destinationAmount: BigInt(amountOut),
+      originChainId: 5000,
+      destinationChainId: 137,
+      originToken: padAddress(assetIn),
+      destinationToken: padAddress(assetOut),
+    });
   };
 
-  const txAwait = useCallback(
-    (tx: Promise<ContractTransaction>): void => {
-      tx.then(async (tx) => {
-        txAwaitModal.showModal();
-        await tx.wait(1);
-        txAwaitModal.closeModal();
-      }).catch((error: JsonRpcError | { error: JsonRpcError }) => {
-        const err =
-          (error as { error: JsonRpcError }).error !== undefined
-            ? (error as { error: JsonRpcError }).error
-            : (error as JsonRpcError);
-        txAwaitModal.closeModal();
-        console.log(extractRevertReason(err));
-      });
-    },
-    [txAwaitModal]
-  );
-
-  return { approveTokenTo, getAmountApprovedFor };
+  return { signOrder, constructOrder };
 };
