@@ -96,6 +96,8 @@ contract Settlement is Initializable, OApp {
             cId := chainid()
         }
         THIS_CHAIN_ID = cId;
+
+        // We map known destination chainIds to eIds and reverse
         chainIdToEid[137] = 30109; // polygon
         chainIdToEid[5000] = 30181; // mantle
         chainIdToEid[42161] = 30110; // arb
@@ -105,6 +107,9 @@ contract Settlement is Initializable, OApp {
         eidToChainId[30181] = 5000; // mantle
         eidToChainId[30110] = 42161; // arb
         eidToChainId[30168] = 0; // solana
+        
+        /// @notice this raises the question as to whether we refer to e.g. solana
+        /// via chainid since chais like that do not have one
         REFUND_ADDRESS = payable(msg.sender);
     }
 

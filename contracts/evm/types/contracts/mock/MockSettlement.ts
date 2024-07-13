@@ -159,7 +159,6 @@ export interface MockSettlementInterface extends Interface {
       | "endpoint"
       | "getOrderHash"
       | "getOrderTypeHash"
-      | "getPeerOrRevert"
       | "initiate"
       | "isComposeMsgSender"
       | "lzReceive"
@@ -218,10 +217,6 @@ export interface MockSettlementInterface extends Interface {
   encodeFunctionData(
     functionFragment: "getOrderTypeHash",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getPeerOrRevert",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "initiate",
@@ -313,10 +308,6 @@ export interface MockSettlementInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getOrderTypeHash",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getPeerOrRevert",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initiate", data: BytesLike): Result;
@@ -523,8 +514,6 @@ export interface MockSettlement extends BaseContract {
 
   getOrderTypeHash: TypedContractMethod<[], [string], "view">;
 
-  getPeerOrRevert: TypedContractMethod<[_eid: BigNumberish], [string], "view">;
-
   initiate: TypedContractMethod<
     [
       order: OrderLib.CrossChainOrderStruct,
@@ -670,9 +659,6 @@ export interface MockSettlement extends BaseContract {
   getFunction(
     nameOrSignature: "getOrderTypeHash"
   ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "getPeerOrRevert"
-  ): TypedContractMethod<[_eid: BigNumberish], [string], "view">;
   getFunction(
     nameOrSignature: "initiate"
   ): TypedContractMethod<
