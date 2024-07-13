@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "types": [
+      "mocha",
+      "chai"
+    ],
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "lib": [
+      "es2015"
+    ],
+    "sourceMap": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "esnext",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "allowImportingTsExtensions": true,
+    "noUnusedParameters": true,
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "strict": true
+  }
+}
