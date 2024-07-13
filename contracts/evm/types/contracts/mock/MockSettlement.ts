@@ -21,7 +21,7 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from "../common";
+} from "../../common";
 
 export declare namespace OrderLib {
   export type CrossChainOrderStruct = {
@@ -126,7 +126,7 @@ export declare namespace OrderLib {
   };
 }
 
-export interface SettlementInterface extends Interface {
+export interface MockSettlementInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "DEFAULT_PAYLOAD_SIZE_LIMIT"
@@ -143,6 +143,7 @@ export interface SettlementInterface extends Interface {
       | "lzEndpoint"
       | "lzReceive"
       | "minDstGasLookup"
+      | "mockSetChainId"
       | "nonblockingLzReceive"
       | "owner"
       | "payloadSizeLimitLookup"
@@ -231,6 +232,10 @@ export interface SettlementInterface extends Interface {
   encodeFunctionData(
     functionFragment: "minDstGasLookup",
     values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mockSetChainId",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "nonblockingLzReceive",
@@ -345,6 +350,10 @@ export interface SettlementInterface extends Interface {
   decodeFunctionResult(functionFragment: "lzReceive", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "minDstGasLookup",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "mockSetChainId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -551,11 +560,11 @@ export namespace SetTrustedRemoteAddressEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export interface Settlement extends BaseContract {
-  connect(runner?: ContractRunner | null): Settlement;
+export interface MockSettlement extends BaseContract {
+  connect(runner?: ContractRunner | null): MockSettlement;
   waitForDeployment(): Promise<this>;
 
-  interface: SettlementInterface;
+  interface: MockSettlementInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -670,6 +679,12 @@ export interface Settlement extends BaseContract {
     [arg0: BigNumberish, arg1: BigNumberish],
     [bigint],
     "view"
+  >;
+
+  mockSetChainId: TypedContractMethod<
+    [cId: BigNumberish],
+    [void],
+    "nonpayable"
   >;
 
   nonblockingLzReceive: TypedContractMethod<
@@ -889,6 +904,9 @@ export interface Settlement extends BaseContract {
     [bigint],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "mockSetChainId"
+  ): TypedContractMethod<[cId: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "nonblockingLzReceive"
   ): TypedContractMethod<

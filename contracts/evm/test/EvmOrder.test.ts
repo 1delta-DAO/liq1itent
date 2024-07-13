@@ -1,9 +1,18 @@
 import { AbiCoder, parseEther, solidityPacked, ZeroAddress } from "ethers"
 import { ethers } from 'hardhat';
 
-import { LZEndpointMock, LZEndpointMock__factory, MockERC20, MockERC20__factory, OFTV2, OFTV2__factory, ProxyOFTV2, ProxyOFTV2__factory, Settlement, Settlement__factory } from "../types"
+import {
+    LZEndpointMock,
+    LZEndpointMock__factory,
+    MockERC20,
+    MockERC20__factory,
+    MockSettlement,
+    MockSettlement__factory
+} from "../types"
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers"
 import { expect } from "chai";
+import { CrossChainOrder, getHash, getOrder, padAddress } from "./utils";
+import { ethSignHashWithProviderAsync } from "./utils/signature_utils";
 
 describe("EvmOrder: ", function () {
     const localChainId = 1
@@ -21,8 +30,8 @@ describe("EvmOrder: ", function () {
     let localErc20: MockERC20
     let remoteErc20: MockERC20
 
-    let localSettlement: Settlement
-    let remoteSettlement: Settlement
+    let localSettlement: MockSettlement
+    let remoteSettlement: MockSettlement
 
     let localSettlementAddress: string
     let remoteSettlementAddress: string
@@ -50,8 +59,8 @@ describe("EvmOrder: ", function () {
         remoteEndpointAddress = await remoteEndpoint.getAddress()
 
 
-        localSettlement = await new Settlement__factory(owner).deploy(localEndpoint)
-        remoteSettlement = await new Settlement__factory(owner).deploy(remoteEndpoint)
+        localSettlement = await new MockSettlement__factory(owner).deploy(localEndpoint)
+        remoteSettlement = await new MockSettlement__factory(owner).deploy(remoteEndpoint)
         localSettlementAddress = await localSettlement.getAddress()
         remoteSettlementAddress = await remoteSettlement.getAddress()
 
@@ -78,8 +87,34 @@ describe("EvmOrder: ", function () {
         await remoteSettlement.setTrustedRemote(localChainId, localPath) // for B, set A
     })
 
-    it("verify order signature succeeds", async function () {
 
+    it("verify order hash", async function () {
+        const order: CrossChainOrder = getOrder()
+        const hash = getHash(order)
+        const onChainHash = await localSettlement.getOrderHash(order)
+        expect(hash).to.equal(onChainHash)
+    })
+
+    it("verify order signature succeeds", async function () {
+        const order: CrossChainOrder = getOrder({
+            swapper: padAddress(swapperAddress),
+            originChainId: localChainId
+        })
+        console.log("TH", await localSettlement.getOrderTypeHash())
+        const hash = getHash(order)
+        console.log("hash", hash)
+        const vrsSig = await ethSignHashWithProviderAsync(hash, swapper)
+        console.log("vrs", vrsSig)
+        const packedSig = solidityPacked(
+            ['uint8', 'bytes32', 'bytes32'],
+            [vrsSig.v, vrsSig.r, vrsSig.s]
+        )
+        console.log("test")
+        await localSettlement.verifySignature(
+            hash,
+            order.swapper,
+            packedSig
+        )
     })
 
     it("verify malicous order signature fails", async function () {

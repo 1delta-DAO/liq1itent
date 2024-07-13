@@ -53,13 +53,16 @@ contract Settlement is Initializable, NonblockingLzApp {
                                 IMMUTABLES
     //////////////////////////////////////////////////////////////*/
 
-    uint256 public immutable THIS_CHAIN_ID;
+    // this would be the chainId, however, for testinng, with the
+    // mock endpoint, we need to manually configure it
+    // uint256 public immutable THIS_CHAIN_ID;
 
     /*//////////////////////////////////////////////////////////////
                                 STATE
     //////////////////////////////////////////////////////////////*/
 
     address payable public REFUND_ADDRESS;
+    uint256 public THIS_CHAIN_ID;
     mapping(uint32 => mapping(bytes32 => OrderData)) statuses;
 
     /*//////////////////////////////////////////////////////////////
@@ -91,10 +94,11 @@ contract Settlement is Initializable, NonblockingLzApp {
         // compute the order hash
         bytes32 orderHash = OrderLib.getHash(order);
         // verify order sig
-        if (
-            order.swapper.toEvmAddress() !=
-            OrderSig.getSignerOfHash(orderHash, signature)
-        ) revert InvalidOrderSignature(orderHash);
+        verifySignature(
+            orderHash,
+            order.swapper, //
+            signature
+        );
 
         // report the status to the oracle
         _reportSettlementAttempt(order, orderHash);
@@ -104,6 +108,27 @@ contract Settlement is Initializable, NonblockingLzApp {
             address(this),
             order.originAmount
         );
+    }
+
+    function getOrderTypeHash() external view returns (bytes32) {
+        return OrderLib.getOrderTypeHash();
+    }
+
+    function getOrderHash(
+        OrderLib.CrossChainOrder calldata order
+    ) external view returns (bytes32) {
+        return OrderLib.getHash(order);
+    }
+
+    function verifySignature(
+        bytes32 orderHash,
+        bytes32 swapper,
+        bytes calldata signature
+    ) public {
+        if (
+            swapper.toEvmAddress() !=
+            OrderSig.getSignerOfHash(orderHash, signature)
+        ) revert InvalidOrderSignature(orderHash);
     }
 
     /// @notice Resolves a specific CrossChainOrder into a generic ResolvedCrossChainOrder

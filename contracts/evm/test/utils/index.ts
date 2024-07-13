@@ -1,8 +1,10 @@
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
-import { keccak256, solidityPacked } from "ethers";
+import { BigNumberish, getAddress, keccak256, MaxUint256, solidityPacked } from "ethers";
 import { ECSignature, ethSignHashWithProviderAsync } from "./signature_utils";
+import { randomBytes } from "crypto";
+import { hexUtils } from "@0x/utils";
 
-interface CrossChainOrder {
+export interface CrossChainOrder {
     /// @dev The contract address that the order is meant to be settled by.
     /// Fillers send this order to this contract address on the origin chain
     /// @notice we use bytes32 to be compatible with solana
@@ -36,9 +38,10 @@ interface CrossChainOrder {
     destinationAmount: bigint;
 }
 
-const ORDER_TYPEHASH = '0x0'
+const ORDER_TYPEHASH = '0x7d67a4f66acd55f74f30ad361a692350d3913711c2166ea7b7dd1e6b8c4dcf30'
 
 const orderTypes = [
+    'bytes32',
     'bytes32',
     'bytes32',
     'uint256',
@@ -76,9 +79,56 @@ export function getHash(order: CrossChainOrder) {
     ))
 }
 
+const ADDRESS_MASK = BigInt("0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff");
+
+// Create reandom EVM address
+function randomAddress(): string {
+    return getAddress(randomBytes(20).toString('hex'));
+}
+
+export function padAddress(addr: string) {
+    return addr.replace('0x', '0x000000000000000000000000')
+}
+
+function randomPaddedAddress() {
+    return padAddress(randomAddress())
+}
+
+export function createExpiry(deltaSeconds = 60): number {
+    return Math.floor(Date.now() / 1000) + deltaSeconds;
+}
+
+const DEFAULT_EXPIRY = 10000
+
+
+export function getRandomInteger(min: BigNumberish, max: BigNumberish): bigint {
+    const range = BigInt(max) - BigInt(min);
+    const bts = BigInt('0x' + randomBytes(32).toString('hex'))
+    return BigInt(min) + range * bts / MaxUint256;
+}
+
 
 export async function signOrder(
     order: CrossChainOrder,
     signer: SignerWithAddress): Promise<ECSignature> {
     return await ethSignHashWithProviderAsync(getHash(order), signer)
+}
+
+export function getOrder(opts: Partial<CrossChainOrder> = {}): CrossChainOrder {
+    return {
+        settlementContract: randomPaddedAddress(),
+        swapper: randomPaddedAddress(),
+        nonce: getRandomInteger(1e18, 100e18),
+        originChainId: 1,
+        destinationChainId: 1,
+        originAmount: getRandomInteger(1e18, 100e18),
+        destinationAmount: getRandomInteger(1e18, 100e18),
+        fillDeadline: createExpiry(DEFAULT_EXPIRY),
+        destinationToken: randomPaddedAddress(),
+        originToken: randomPaddedAddress(),
+        initiateDeadline: createExpiry(DEFAULT_EXPIRY),
+        destinationSettlementContract: randomPaddedAddress(),
+        destinationReceiver: randomPaddedAddress(),
+        ...opts
+    }
 }

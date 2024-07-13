@@ -3,8 +3,6 @@
 pragma solidity ^0.8.25;
 
 library OrderLib {
-    bytes32 internal constant ORDER_TYPEHASH = 0x0;
-
     struct CrossChainOrder {
         /// @dev The contract address that the order is meant to be settled by.
         /// Fillers send this order to this contract address on the origin chain
@@ -24,7 +22,7 @@ library OrderLib {
         uint32 fillDeadline;
         /** CUSTOM BYTES */
         ///@dev dest chainId
-        uint32 destinationChainId;        
+        uint32 destinationChainId;
         ///@dev dest address
         bytes32 destinationReceiver;
         ///@dev dest settlement contract
@@ -85,13 +83,36 @@ library OrderLib {
         uint32 chainId;
     }
 
+    function getOrderTypeHash() internal pure returns (bytes32) {
+        return
+            keccak256(
+                abi.encodePacked( //
+                    "CrossChainOrder(",
+                    "bytes32 settlementContract",
+                    "bytes32 swapper",
+                    "uint256 nonce",
+                    "uint32 originChainId",
+                    "uint32 initiateDeadline",
+                    "uint32 fillDeadline",
+                    "uint32 destinationChainId",
+                    "bytes32 destinationReceiver",
+                    "bytes32 destinationSettlementContract",
+                    "bytes32 originToken",
+                    "uint256 originAmount",
+                    "bytes32 destinationToken",
+                    "uint256 destinationAmount",
+                    ")"
+                )
+            );
+    }
+
     function getHash(
         CrossChainOrder calldata order
     ) internal pure returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked( //
-                    ORDER_TYPEHASH,
+                    getOrderTypeHash(),
                     order.settlementContract,
                     order.swapper,
                     order.nonce,
