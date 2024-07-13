@@ -13,8 +13,6 @@ import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers"
 import { expect } from "chai";
 import { CrossChainOrder, getHash, getOrder, padAddress } from "./utils";
 import { getPackedSig } from "./utils/signature_utils";
-import { randomBytes } from "crypto";
-import { NULL_BYTES } from "@0x/utils";
 
 describe("EvmOrder: ", function () {
     const localChainId = 1
