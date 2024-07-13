@@ -95,7 +95,7 @@ export function createExpiry(deltaSeconds = 60): number {
     return Math.floor(Date.now() / 1000) + deltaSeconds;
 }
 
-const DEFAULT_EXPIRY = 10000
+const DEFAULT_EXPIRY = 100000
 
 
 export function getRandomInteger(min: BigNumberish, max: BigNumberish): bigint {

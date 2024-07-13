@@ -33,6 +33,8 @@ contract Settlement is Initializable, OApp {
     error InvalidOrderSignature(bytes32 hash);
     error CallerNotMakerOrTaker();
     error AlreadyFilled(bytes32 hash);
+    error NoReplays(bytes32 hash);
+    error InvalidOrder(bytes32 hash);
     error NoPartialFills(bytes32 hash);
     error NotFillable(bytes32 hash);
     error BadOriginChainId(uint256 expectedChainId, uint256 providedChainId);
@@ -107,7 +109,7 @@ contract Settlement is Initializable, OApp {
         eidToChainId[30181] = 5000; // mantle
         eidToChainId[30110] = 42161; // arb
         eidToChainId[30168] = 0; // solana
-        
+
         /// @notice this raises the question as to whether we refer to e.g. solana
         /// via chainid since chais like that do not have one
         REFUND_ADDRESS = payable(msg.sender);
@@ -193,7 +195,6 @@ contract Settlement is Initializable, OApp {
             );
         // the destination chainId for layer 0
         // is the origin chainId of the order
-        uint16 _layerZeroDstChainId = uint16(order.originChainId);
         bytes32 orderHash = OrderLib.getHash(order);
 
         // revert if the order is filled
@@ -218,15 +219,7 @@ contract Settlement is Initializable, OApp {
             originAmountReceiver,
             uint256(0)
         );
-        // transmit the message
-        // endpoint.send{value: msg.value}(
-        //     _layerZeroDstChainId,
-        //     trustedRemote,
-        //     payload,
-        //     REFUND_ADDRESS,
-        //     msg.sender,
-        //     adapterParams
-        // );
+
         // sending from destinationChainId -> originChainId
         uint32 eId = chainIdToEid[order.originChainId];
         endpoint.send{value: msg.value}(
@@ -343,6 +336,13 @@ contract Settlement is Initializable, OApp {
         OrderLib.CrossChainOrder calldata order,
         bytes32 orderHash
     ) internal {
+        // input may never be zero
+        if (order.originAmount == 0) revert InvalidOrder(orderHash);
+        // we prevent replays by ensuring that the
+        // stored maker amount is zero (i.e. the slot is not populated)
+        if (statuses[order.destinationChainId][orderHash].makerAmount != 0)
+            revert NoReplays(orderHash);
+
         OrderData memory orderData = OrderData(
             OrderStatus.PENDING,
             order.swapper,
