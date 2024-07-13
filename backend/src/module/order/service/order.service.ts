@@ -4,6 +4,8 @@ import { OrderInput } from "../../../model/order.input";
 import { InjectRepository } from "@nestjs/typeorm";
 import { OrderEntity } from "../../../model/order.entity";
 import { Repository } from "typeorm";
+import { OrderUpdateStatusInput } from "../../../model/order-status-update.input";
+import { OrderStatus } from "../../../model/order-status.enum";
 
 @Injectable()
 export class OrderService {
@@ -13,10 +15,16 @@ export class OrderService {
     private readonly orderRep: Repository<OrderEntity>
   ) {}
 
-  public async orderFind(): Promise<Order[]> {
-    this.logger.log("Finding orders");
-    const orders = await this.orderRep.find();
-    console.log(orders);
+  public async ordersGet(status: OrderStatus): Promise<Order[]> {
+    this.logger.log(
+      "Getting orders" + (status ? " with status " + status : "")
+    );
+    let orders: OrderEntity[];
+    if (status) {
+      orders = await this.orderRep.find({ where: { status } });
+    } else {
+      orders = await this.orderRep.find();
+    }
     return orders;
   }
 
@@ -24,5 +32,13 @@ export class OrderService {
     this.logger.log("Creating order");
     this.orderRep.create(order).save();
     return true;
+  }
+
+  public async orderUpdateStatus(
+    osu: OrderUpdateStatusInput
+  ): Promise<boolean> {
+    this.logger.log("Updating order status");
+    const res = await this.orderRep.update(osu.id, { status: osu.status });
+    return res.affected == null ? false : res.affected > 0;
   }
 }
