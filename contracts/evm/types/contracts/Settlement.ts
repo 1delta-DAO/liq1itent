@@ -23,6 +23,28 @@ import type {
   TypedContractMethod,
 } from "../common";
 
+export type OriginStruct = {
+  srcEid: BigNumberish;
+  sender: BytesLike;
+  nonce: BigNumberish;
+};
+
+export type OriginStructOutput = [
+  srcEid: bigint,
+  sender: string,
+  nonce: bigint
+] & { srcEid: bigint; sender: string; nonce: bigint };
+
+export type MessagingFeeStruct = {
+  nativeFee: BigNumberish;
+  lzTokenFee: BigNumberish;
+};
+
+export type MessagingFeeStructOutput = [
+  nativeFee: bigint,
+  lzTokenFee: bigint
+] & { nativeFee: bigint; lzTokenFee: bigint };
+
 export declare namespace OrderLib {
   export type CrossChainOrderStruct = {
     settlementContract: BytesLike;
@@ -129,58 +151,43 @@ export declare namespace OrderLib {
 export interface SettlementInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "DEFAULT_PAYLOAD_SIZE_LIMIT"
       | "REFUND_ADDRESS"
       | "THIS_CHAIN_ID"
-      | "estimateSendFee"
-      | "failedMessages"
-      | "forceResumeReceive"
-      | "getConfig"
+      | "allowInitializePath"
+      | "cancelOrder"
+      | "emergencyWithdraw"
+      | "endpoint"
       | "getOrderHash"
       | "getOrderTypeHash"
-      | "getTrustedRemoteAddress"
+      | "getPeerOrRevert"
       | "initiate"
-      | "isTrustedRemote"
-      | "lzEndpoint"
+      | "isComposeMsgSender"
       | "lzReceive"
-      | "minDstGasLookup"
-      | "nonblockingLzReceive"
+      | "nextNonce"
+      | "oAppVersion"
       | "owner"
-      | "payloadSizeLimitLookup"
-      | "precrime"
+      | "peers"
+      | "quote"
       | "renounceOwnership"
       | "resolve"
-      | "retryMessage"
-      | "setConfig"
-      | "setMinDstGas"
-      | "setPayloadSizeLimit"
-      | "setPrecrime"
-      | "setReceiveVersion"
-      | "setSendVersion"
-      | "setTrustedRemote"
-      | "setTrustedRemoteAddress"
+      | "setDelegate"
+      | "setPeer"
       | "settle"
       | "transferOwnership"
-      | "trustedRemoteLookup"
       | "verifySignature"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
+      | "FillingCompleted"
+      | "FillingInititated"
       | "Initialized"
-      | "MessageFailed"
+      | "OrderCancelled"
       | "OwnershipTransferred"
-      | "RetryMessageSuccess"
-      | "SetMinDstGas"
-      | "SetPrecrime"
-      | "SetTrustedRemote"
-      | "SetTrustedRemoteAddress"
+      | "PeerSet"
+      | "SolverPaid"
   ): EventFragment;
 
-  encodeFunctionData(
-    functionFragment: "DEFAULT_PAYLOAD_SIZE_LIMIT",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "REFUND_ADDRESS",
     values?: undefined
@@ -190,21 +197,18 @@ export interface SettlementInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "estimateSendFee",
-    values: [BigNumberish, BytesLike, BytesLike, boolean, BytesLike]
+    functionFragment: "allowInitializePath",
+    values: [OriginStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "failedMessages",
-    values: [BigNumberish, BytesLike, BigNumberish]
+    functionFragment: "cancelOrder",
+    values: [OrderLib.CrossChainOrderStruct, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "forceResumeReceive",
-    values: [BigNumberish, BytesLike]
+    functionFragment: "emergencyWithdraw",
+    values: [AddressLike]
   ): string;
-  encodeFunctionData(
-    functionFragment: "getConfig",
-    values: [BigNumberish, BigNumberish, AddressLike, BigNumberish]
-  ): string;
+  encodeFunctionData(functionFragment: "endpoint", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getOrderHash",
     values: [OrderLib.CrossChainOrderStruct]
@@ -214,7 +218,7 @@ export interface SettlementInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getTrustedRemoteAddress",
+    functionFragment: "getPeerOrRevert",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -222,31 +226,27 @@ export interface SettlementInterface extends Interface {
     values: [OrderLib.CrossChainOrderStruct, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "isTrustedRemote",
-    values: [BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "lzEndpoint",
-    values?: undefined
+    functionFragment: "isComposeMsgSender",
+    values: [OriginStruct, BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "lzReceive",
-    values: [BigNumberish, BytesLike, BigNumberish, BytesLike]
+    values: [OriginStruct, BytesLike, BytesLike, AddressLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "minDstGasLookup",
-    values: [BigNumberish, BigNumberish]
+    functionFragment: "nextNonce",
+    values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "nonblockingLzReceive",
-    values: [BigNumberish, BytesLike, BigNumberish, BytesLike]
+    functionFragment: "oAppVersion",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "peers", values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "payloadSizeLimitLookup",
-    values: [BigNumberish]
+    functionFragment: "quote",
+    values: [BigNumberish, BytesLike, BytesLike, boolean]
   ): string;
-  encodeFunctionData(functionFragment: "precrime", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
@@ -256,39 +256,11 @@ export interface SettlementInterface extends Interface {
     values: [OrderLib.CrossChainOrderStruct, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "retryMessage",
-    values: [BigNumberish, BytesLike, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setConfig",
-    values: [BigNumberish, BigNumberish, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMinDstGas",
-    values: [BigNumberish, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPayloadSizeLimit",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPrecrime",
+    functionFragment: "setDelegate",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "setReceiveVersion",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setSendVersion",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setTrustedRemote",
-    values: [BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setTrustedRemoteAddress",
+    functionFragment: "setPeer",
     values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
@@ -300,18 +272,10 @@ export interface SettlementInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "trustedRemoteLookup",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "verifySignature",
     values: [BytesLike, BytesLike, BytesLike]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "DEFAULT_PAYLOAD_SIZE_LIMIT",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "REFUND_ADDRESS",
     data: BytesLike
@@ -321,18 +285,18 @@ export interface SettlementInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "estimateSendFee",
+    functionFragment: "allowInitializePath",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "failedMessages",
+    functionFragment: "cancelOrder",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "forceResumeReceive",
+    functionFragment: "emergencyWithdraw",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getConfig", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "endpoint", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getOrderHash",
     data: BytesLike
@@ -342,81 +306,66 @@ export interface SettlementInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getTrustedRemoteAddress",
+    functionFragment: "getPeerOrRevert",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initiate", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "isTrustedRemote",
+    functionFragment: "isComposeMsgSender",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "lzEndpoint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lzReceive", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nextNonce", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "minDstGasLookup",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "nonblockingLzReceive",
+    functionFragment: "oAppVersion",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "payloadSizeLimitLookup",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "precrime", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "peers", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "quote", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "resolve", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "retryMessage",
+    functionFragment: "setDelegate",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setConfig", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setMinDstGas",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setPayloadSizeLimit",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setPrecrime",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setReceiveVersion",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setSendVersion",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setTrustedRemote",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setTrustedRemoteAddress",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "setPeer", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "settle", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "trustedRemoteLookup",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "verifySignature",
     data: BytesLike
   ): Result;
+}
+
+export namespace FillingCompletedEvent {
+  export type InputTuple = [hash: BytesLike];
+  export type OutputTuple = [hash: string];
+  export interface OutputObject {
+    hash: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace FillingInititatedEvent {
+  export type InputTuple = [hash: BytesLike];
+  export type OutputTuple = [hash: string];
+  export interface OutputObject {
+    hash: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export namespace InitializedEvent {
@@ -431,27 +380,11 @@ export namespace InitializedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace MessageFailedEvent {
-  export type InputTuple = [
-    _srcChainId: BigNumberish,
-    _srcAddress: BytesLike,
-    _nonce: BigNumberish,
-    _payload: BytesLike,
-    _reason: BytesLike
-  ];
-  export type OutputTuple = [
-    _srcChainId: bigint,
-    _srcAddress: string,
-    _nonce: bigint,
-    _payload: string,
-    _reason: string
-  ];
+export namespace OrderCancelledEvent {
+  export type InputTuple = [hash: BytesLike];
+  export type OutputTuple = [hash: string];
   export interface OutputObject {
-    _srcChainId: bigint;
-    _srcAddress: string;
-    _nonce: bigint;
-    _payload: string;
-    _reason: string;
+    hash: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -472,24 +405,12 @@ export namespace OwnershipTransferredEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace RetryMessageSuccessEvent {
-  export type InputTuple = [
-    _srcChainId: BigNumberish,
-    _srcAddress: BytesLike,
-    _nonce: BigNumberish,
-    _payloadHash: BytesLike
-  ];
-  export type OutputTuple = [
-    _srcChainId: bigint,
-    _srcAddress: string,
-    _nonce: bigint,
-    _payloadHash: string
-  ];
+export namespace PeerSetEvent {
+  export type InputTuple = [eid: BigNumberish, peer: BytesLike];
+  export type OutputTuple = [eid: bigint, peer: string];
   export interface OutputObject {
-    _srcChainId: bigint;
-    _srcAddress: string;
-    _nonce: bigint;
-    _payloadHash: string;
+    eid: bigint;
+    peer: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -497,62 +418,11 @@ export namespace RetryMessageSuccessEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace SetMinDstGasEvent {
-  export type InputTuple = [
-    _dstChainId: BigNumberish,
-    _type: BigNumberish,
-    _minDstGas: BigNumberish
-  ];
-  export type OutputTuple = [
-    _dstChainId: bigint,
-    _type: bigint,
-    _minDstGas: bigint
-  ];
+export namespace SolverPaidEvent {
+  export type InputTuple = [hash: BytesLike];
+  export type OutputTuple = [hash: string];
   export interface OutputObject {
-    _dstChainId: bigint;
-    _type: bigint;
-    _minDstGas: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export namespace SetPrecrimeEvent {
-  export type InputTuple = [precrime: AddressLike];
-  export type OutputTuple = [precrime: string];
-  export interface OutputObject {
-    precrime: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export namespace SetTrustedRemoteEvent {
-  export type InputTuple = [_remoteChainId: BigNumberish, _path: BytesLike];
-  export type OutputTuple = [_remoteChainId: bigint, _path: string];
-  export interface OutputObject {
-    _remoteChainId: bigint;
-    _path: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export namespace SetTrustedRemoteAddressEvent {
-  export type InputTuple = [
-    _remoteChainId: BigNumberish,
-    _remoteAddress: BytesLike
-  ];
-  export type OutputTuple = [_remoteChainId: bigint, _remoteAddress: string];
-  export interface OutputObject {
-    _remoteChainId: bigint;
-    _remoteAddress: string;
+    hash: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -603,46 +473,29 @@ export interface Settlement extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  DEFAULT_PAYLOAD_SIZE_LIMIT: TypedContractMethod<[], [bigint], "view">;
-
   REFUND_ADDRESS: TypedContractMethod<[], [string], "view">;
 
   THIS_CHAIN_ID: TypedContractMethod<[], [bigint], "view">;
 
-  estimateSendFee: TypedContractMethod<
-    [
-      _dstChainId: BigNumberish,
-      _toAddress: BytesLike,
-      _orderHash: BytesLike,
-      _useZro: boolean,
-      _adapterParams: BytesLike
-    ],
-    [[bigint, bigint] & { nativeFee: bigint; zroFee: bigint }],
+  allowInitializePath: TypedContractMethod<
+    [origin: OriginStruct],
+    [boolean],
     "view"
   >;
 
-  failedMessages: TypedContractMethod<
-    [arg0: BigNumberish, arg1: BytesLike, arg2: BigNumberish],
-    [string],
-    "view"
+  cancelOrder: TypedContractMethod<
+    [order: OrderLib.CrossChainOrderStruct, endpointOptions: BytesLike],
+    [void],
+    "payable"
   >;
 
-  forceResumeReceive: TypedContractMethod<
-    [_srcChainId: BigNumberish, _srcAddress: BytesLike],
+  emergencyWithdraw: TypedContractMethod<
+    [asset: AddressLike],
     [void],
     "nonpayable"
   >;
 
-  getConfig: TypedContractMethod<
-    [
-      _version: BigNumberish,
-      _chainId: BigNumberish,
-      arg2: AddressLike,
-      _configType: BigNumberish
-    ],
-    [string],
-    "view"
-  >;
+  endpoint: TypedContractMethod<[], [string], "view">;
 
   getOrderHash: TypedContractMethod<
     [order: OrderLib.CrossChainOrderStruct],
@@ -652,11 +505,7 @@ export interface Settlement extends BaseContract {
 
   getOrderTypeHash: TypedContractMethod<[], [string], "view">;
 
-  getTrustedRemoteAddress: TypedContractMethod<
-    [_remoteChainId: BigNumberish],
-    [string],
-    "view"
-  >;
+  getPeerOrRevert: TypedContractMethod<[_eid: BigNumberish], [string], "view">;
 
   initiate: TypedContractMethod<
     [
@@ -668,51 +517,50 @@ export interface Settlement extends BaseContract {
     "nonpayable"
   >;
 
-  isTrustedRemote: TypedContractMethod<
-    [_srcChainId: BigNumberish, _srcAddress: BytesLike],
+  isComposeMsgSender: TypedContractMethod<
+    [arg0: OriginStruct, arg1: BytesLike, _sender: AddressLike],
     [boolean],
     "view"
   >;
 
-  lzEndpoint: TypedContractMethod<[], [string], "view">;
-
   lzReceive: TypedContractMethod<
     [
-      _srcChainId: BigNumberish,
-      _srcAddress: BytesLike,
-      _nonce: BigNumberish,
-      _payload: BytesLike
+      _origin: OriginStruct,
+      _guid: BytesLike,
+      _message: BytesLike,
+      _executor: AddressLike,
+      _extraData: BytesLike
     ],
     [void],
-    "nonpayable"
+    "payable"
   >;
 
-  minDstGasLookup: TypedContractMethod<
-    [arg0: BigNumberish, arg1: BigNumberish],
+  nextNonce: TypedContractMethod<
+    [arg0: BigNumberish, arg1: BytesLike],
     [bigint],
     "view"
   >;
 
-  nonblockingLzReceive: TypedContractMethod<
-    [
-      _srcChainId: BigNumberish,
-      _srcAddress: BytesLike,
-      _nonce: BigNumberish,
-      _payload: BytesLike
-    ],
-    [void],
-    "nonpayable"
+  oAppVersion: TypedContractMethod<
+    [],
+    [[bigint, bigint] & { senderVersion: bigint; receiverVersion: bigint }],
+    "view"
   >;
 
   owner: TypedContractMethod<[], [string], "view">;
 
-  payloadSizeLimitLookup: TypedContractMethod<
-    [arg0: BigNumberish],
-    [bigint],
+  peers: TypedContractMethod<[eid: BigNumberish], [string], "view">;
+
+  quote: TypedContractMethod<
+    [
+      _dstEid: BigNumberish,
+      _message: BytesLike,
+      _options: BytesLike,
+      _payInLzToken: boolean
+    ],
+    [MessagingFeeStructOutput],
     "view"
   >;
-
-  precrime: TypedContractMethod<[], [string], "view">;
 
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
@@ -722,70 +570,14 @@ export interface Settlement extends BaseContract {
     "view"
   >;
 
-  retryMessage: TypedContractMethod<
-    [
-      _srcChainId: BigNumberish,
-      _srcAddress: BytesLike,
-      _nonce: BigNumberish,
-      _payload: BytesLike
-    ],
-    [void],
-    "payable"
-  >;
-
-  setConfig: TypedContractMethod<
-    [
-      _version: BigNumberish,
-      _chainId: BigNumberish,
-      _configType: BigNumberish,
-      _config: BytesLike
-    ],
+  setDelegate: TypedContractMethod<
+    [_delegate: AddressLike],
     [void],
     "nonpayable"
   >;
 
-  setMinDstGas: TypedContractMethod<
-    [
-      _dstChainId: BigNumberish,
-      _packetType: BigNumberish,
-      _minGas: BigNumberish
-    ],
-    [void],
-    "nonpayable"
-  >;
-
-  setPayloadSizeLimit: TypedContractMethod<
-    [_dstChainId: BigNumberish, _size: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-
-  setPrecrime: TypedContractMethod<
-    [_precrime: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-
-  setReceiveVersion: TypedContractMethod<
-    [_version: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-
-  setSendVersion: TypedContractMethod<
-    [_version: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-
-  setTrustedRemote: TypedContractMethod<
-    [_remoteChainId: BigNumberish, _path: BytesLike],
-    [void],
-    "nonpayable"
-  >;
-
-  setTrustedRemoteAddress: TypedContractMethod<
-    [_remoteChainId: BigNumberish, _remoteAddress: BytesLike],
+  setPeer: TypedContractMethod<
+    [_eid: BigNumberish, _peer: BytesLike],
     [void],
     "nonpayable"
   >;
@@ -794,7 +586,7 @@ export interface Settlement extends BaseContract {
     [
       originAmountReceiver: BytesLike,
       order: OrderLib.CrossChainOrderStruct,
-      adapterParams: BytesLike
+      endpointOptions: BytesLike
     ],
     [void],
     "payable"
@@ -804,12 +596,6 @@ export interface Settlement extends BaseContract {
     [newOwner: AddressLike],
     [void],
     "nonpayable"
-  >;
-
-  trustedRemoteLookup: TypedContractMethod<
-    [arg0: BigNumberish],
-    [string],
-    "view"
   >;
 
   verifySignature: TypedContractMethod<
@@ -823,53 +609,27 @@ export interface Settlement extends BaseContract {
   ): T;
 
   getFunction(
-    nameOrSignature: "DEFAULT_PAYLOAD_SIZE_LIMIT"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
     nameOrSignature: "REFUND_ADDRESS"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "THIS_CHAIN_ID"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "estimateSendFee"
-  ): TypedContractMethod<
-    [
-      _dstChainId: BigNumberish,
-      _toAddress: BytesLike,
-      _orderHash: BytesLike,
-      _useZro: boolean,
-      _adapterParams: BytesLike
-    ],
-    [[bigint, bigint] & { nativeFee: bigint; zroFee: bigint }],
-    "view"
-  >;
+    nameOrSignature: "allowInitializePath"
+  ): TypedContractMethod<[origin: OriginStruct], [boolean], "view">;
   getFunction(
-    nameOrSignature: "failedMessages"
+    nameOrSignature: "cancelOrder"
   ): TypedContractMethod<
-    [arg0: BigNumberish, arg1: BytesLike, arg2: BigNumberish],
-    [string],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "forceResumeReceive"
-  ): TypedContractMethod<
-    [_srcChainId: BigNumberish, _srcAddress: BytesLike],
+    [order: OrderLib.CrossChainOrderStruct, endpointOptions: BytesLike],
     [void],
-    "nonpayable"
+    "payable"
   >;
   getFunction(
-    nameOrSignature: "getConfig"
-  ): TypedContractMethod<
-    [
-      _version: BigNumberish,
-      _chainId: BigNumberish,
-      arg2: AddressLike,
-      _configType: BigNumberish
-    ],
-    [string],
-    "view"
-  >;
+    nameOrSignature: "emergencyWithdraw"
+  ): TypedContractMethod<[asset: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "endpoint"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "getOrderHash"
   ): TypedContractMethod<
@@ -881,8 +641,8 @@ export interface Settlement extends BaseContract {
     nameOrSignature: "getOrderTypeHash"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "getTrustedRemoteAddress"
-  ): TypedContractMethod<[_remoteChainId: BigNumberish], [string], "view">;
+    nameOrSignature: "getPeerOrRevert"
+  ): TypedContractMethod<[_eid: BigNumberish], [string], "view">;
   getFunction(
     nameOrSignature: "initiate"
   ): TypedContractMethod<
@@ -895,55 +655,57 @@ export interface Settlement extends BaseContract {
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "isTrustedRemote"
+    nameOrSignature: "isComposeMsgSender"
   ): TypedContractMethod<
-    [_srcChainId: BigNumberish, _srcAddress: BytesLike],
+    [arg0: OriginStruct, arg1: BytesLike, _sender: AddressLike],
     [boolean],
     "view"
   >;
   getFunction(
-    nameOrSignature: "lzEndpoint"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
     nameOrSignature: "lzReceive"
   ): TypedContractMethod<
     [
-      _srcChainId: BigNumberish,
-      _srcAddress: BytesLike,
-      _nonce: BigNumberish,
-      _payload: BytesLike
+      _origin: OriginStruct,
+      _guid: BytesLike,
+      _message: BytesLike,
+      _executor: AddressLike,
+      _extraData: BytesLike
     ],
     [void],
-    "nonpayable"
+    "payable"
   >;
   getFunction(
-    nameOrSignature: "minDstGasLookup"
+    nameOrSignature: "nextNonce"
   ): TypedContractMethod<
-    [arg0: BigNumberish, arg1: BigNumberish],
+    [arg0: BigNumberish, arg1: BytesLike],
     [bigint],
     "view"
   >;
   getFunction(
-    nameOrSignature: "nonblockingLzReceive"
+    nameOrSignature: "oAppVersion"
   ): TypedContractMethod<
-    [
-      _srcChainId: BigNumberish,
-      _srcAddress: BytesLike,
-      _nonce: BigNumberish,
-      _payload: BytesLike
-    ],
-    [void],
-    "nonpayable"
+    [],
+    [[bigint, bigint] & { senderVersion: bigint; receiverVersion: bigint }],
+    "view"
   >;
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "payloadSizeLimitLookup"
-  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+    nameOrSignature: "peers"
+  ): TypedContractMethod<[eid: BigNumberish], [string], "view">;
   getFunction(
-    nameOrSignature: "precrime"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: "quote"
+  ): TypedContractMethod<
+    [
+      _dstEid: BigNumberish,
+      _message: BytesLike,
+      _options: BytesLike,
+      _payInLzToken: boolean
+    ],
+    [MessagingFeeStructOutput],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
@@ -955,67 +717,12 @@ export interface Settlement extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "retryMessage"
+    nameOrSignature: "setDelegate"
+  ): TypedContractMethod<[_delegate: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setPeer"
   ): TypedContractMethod<
-    [
-      _srcChainId: BigNumberish,
-      _srcAddress: BytesLike,
-      _nonce: BigNumberish,
-      _payload: BytesLike
-    ],
-    [void],
-    "payable"
-  >;
-  getFunction(
-    nameOrSignature: "setConfig"
-  ): TypedContractMethod<
-    [
-      _version: BigNumberish,
-      _chainId: BigNumberish,
-      _configType: BigNumberish,
-      _config: BytesLike
-    ],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "setMinDstGas"
-  ): TypedContractMethod<
-    [
-      _dstChainId: BigNumberish,
-      _packetType: BigNumberish,
-      _minGas: BigNumberish
-    ],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "setPayloadSizeLimit"
-  ): TypedContractMethod<
-    [_dstChainId: BigNumberish, _size: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "setPrecrime"
-  ): TypedContractMethod<[_precrime: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "setReceiveVersion"
-  ): TypedContractMethod<[_version: BigNumberish], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "setSendVersion"
-  ): TypedContractMethod<[_version: BigNumberish], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "setTrustedRemote"
-  ): TypedContractMethod<
-    [_remoteChainId: BigNumberish, _path: BytesLike],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "setTrustedRemoteAddress"
-  ): TypedContractMethod<
-    [_remoteChainId: BigNumberish, _remoteAddress: BytesLike],
+    [_eid: BigNumberish, _peer: BytesLike],
     [void],
     "nonpayable"
   >;
@@ -1025,7 +732,7 @@ export interface Settlement extends BaseContract {
     [
       originAmountReceiver: BytesLike,
       order: OrderLib.CrossChainOrderStruct,
-      adapterParams: BytesLike
+      endpointOptions: BytesLike
     ],
     [void],
     "payable"
@@ -1033,9 +740,6 @@ export interface Settlement extends BaseContract {
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "trustedRemoteLookup"
-  ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
   getFunction(
     nameOrSignature: "verifySignature"
   ): TypedContractMethod<
@@ -1045,6 +749,20 @@ export interface Settlement extends BaseContract {
   >;
 
   getEvent(
+    key: "FillingCompleted"
+  ): TypedContractEvent<
+    FillingCompletedEvent.InputTuple,
+    FillingCompletedEvent.OutputTuple,
+    FillingCompletedEvent.OutputObject
+  >;
+  getEvent(
+    key: "FillingInititated"
+  ): TypedContractEvent<
+    FillingInititatedEvent.InputTuple,
+    FillingInititatedEvent.OutputTuple,
+    FillingInititatedEvent.OutputObject
+  >;
+  getEvent(
     key: "Initialized"
   ): TypedContractEvent<
     InitializedEvent.InputTuple,
@@ -1052,11 +770,11 @@ export interface Settlement extends BaseContract {
     InitializedEvent.OutputObject
   >;
   getEvent(
-    key: "MessageFailed"
+    key: "OrderCancelled"
   ): TypedContractEvent<
-    MessageFailedEvent.InputTuple,
-    MessageFailedEvent.OutputTuple,
-    MessageFailedEvent.OutputObject
+    OrderCancelledEvent.InputTuple,
+    OrderCancelledEvent.OutputTuple,
+    OrderCancelledEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -1066,42 +784,43 @@ export interface Settlement extends BaseContract {
     OwnershipTransferredEvent.OutputObject
   >;
   getEvent(
-    key: "RetryMessageSuccess"
+    key: "PeerSet"
   ): TypedContractEvent<
-    RetryMessageSuccessEvent.InputTuple,
-    RetryMessageSuccessEvent.OutputTuple,
-    RetryMessageSuccessEvent.OutputObject
+    PeerSetEvent.InputTuple,
+    PeerSetEvent.OutputTuple,
+    PeerSetEvent.OutputObject
   >;
   getEvent(
-    key: "SetMinDstGas"
+    key: "SolverPaid"
   ): TypedContractEvent<
-    SetMinDstGasEvent.InputTuple,
-    SetMinDstGasEvent.OutputTuple,
-    SetMinDstGasEvent.OutputObject
-  >;
-  getEvent(
-    key: "SetPrecrime"
-  ): TypedContractEvent<
-    SetPrecrimeEvent.InputTuple,
-    SetPrecrimeEvent.OutputTuple,
-    SetPrecrimeEvent.OutputObject
-  >;
-  getEvent(
-    key: "SetTrustedRemote"
-  ): TypedContractEvent<
-    SetTrustedRemoteEvent.InputTuple,
-    SetTrustedRemoteEvent.OutputTuple,
-    SetTrustedRemoteEvent.OutputObject
-  >;
-  getEvent(
-    key: "SetTrustedRemoteAddress"
-  ): TypedContractEvent<
-    SetTrustedRemoteAddressEvent.InputTuple,
-    SetTrustedRemoteAddressEvent.OutputTuple,
-    SetTrustedRemoteAddressEvent.OutputObject
+    SolverPaidEvent.InputTuple,
+    SolverPaidEvent.OutputTuple,
+    SolverPaidEvent.OutputObject
   >;
 
   filters: {
+    "FillingCompleted(bytes32)": TypedContractEvent<
+      FillingCompletedEvent.InputTuple,
+      FillingCompletedEvent.OutputTuple,
+      FillingCompletedEvent.OutputObject
+    >;
+    FillingCompleted: TypedContractEvent<
+      FillingCompletedEvent.InputTuple,
+      FillingCompletedEvent.OutputTuple,
+      FillingCompletedEvent.OutputObject
+    >;
+
+    "FillingInititated(bytes32)": TypedContractEvent<
+      FillingInititatedEvent.InputTuple,
+      FillingInititatedEvent.OutputTuple,
+      FillingInititatedEvent.OutputObject
+    >;
+    FillingInititated: TypedContractEvent<
+      FillingInititatedEvent.InputTuple,
+      FillingInititatedEvent.OutputTuple,
+      FillingInititatedEvent.OutputObject
+    >;
+
     "Initialized(uint64)": TypedContractEvent<
       InitializedEvent.InputTuple,
       InitializedEvent.OutputTuple,
@@ -1113,15 +832,15 @@ export interface Settlement extends BaseContract {
       InitializedEvent.OutputObject
     >;
 
-    "MessageFailed(uint16,bytes,uint64,bytes,bytes)": TypedContractEvent<
-      MessageFailedEvent.InputTuple,
-      MessageFailedEvent.OutputTuple,
-      MessageFailedEvent.OutputObject
+    "OrderCancelled(bytes32)": TypedContractEvent<
+      OrderCancelledEvent.InputTuple,
+      OrderCancelledEvent.OutputTuple,
+      OrderCancelledEvent.OutputObject
     >;
-    MessageFailed: TypedContractEvent<
-      MessageFailedEvent.InputTuple,
-      MessageFailedEvent.OutputTuple,
-      MessageFailedEvent.OutputObject
+    OrderCancelled: TypedContractEvent<
+      OrderCancelledEvent.InputTuple,
+      OrderCancelledEvent.OutputTuple,
+      OrderCancelledEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<
@@ -1135,59 +854,26 @@ export interface Settlement extends BaseContract {
       OwnershipTransferredEvent.OutputObject
     >;
 
-    "RetryMessageSuccess(uint16,bytes,uint64,bytes32)": TypedContractEvent<
-      RetryMessageSuccessEvent.InputTuple,
-      RetryMessageSuccessEvent.OutputTuple,
-      RetryMessageSuccessEvent.OutputObject
+    "PeerSet(uint32,bytes32)": TypedContractEvent<
+      PeerSetEvent.InputTuple,
+      PeerSetEvent.OutputTuple,
+      PeerSetEvent.OutputObject
     >;
-    RetryMessageSuccess: TypedContractEvent<
-      RetryMessageSuccessEvent.InputTuple,
-      RetryMessageSuccessEvent.OutputTuple,
-      RetryMessageSuccessEvent.OutputObject
-    >;
-
-    "SetMinDstGas(uint16,uint16,uint256)": TypedContractEvent<
-      SetMinDstGasEvent.InputTuple,
-      SetMinDstGasEvent.OutputTuple,
-      SetMinDstGasEvent.OutputObject
-    >;
-    SetMinDstGas: TypedContractEvent<
-      SetMinDstGasEvent.InputTuple,
-      SetMinDstGasEvent.OutputTuple,
-      SetMinDstGasEvent.OutputObject
+    PeerSet: TypedContractEvent<
+      PeerSetEvent.InputTuple,
+      PeerSetEvent.OutputTuple,
+      PeerSetEvent.OutputObject
     >;
 
-    "SetPrecrime(address)": TypedContractEvent<
-      SetPrecrimeEvent.InputTuple,
-      SetPrecrimeEvent.OutputTuple,
-      SetPrecrimeEvent.OutputObject
+    "SolverPaid(bytes32)": TypedContractEvent<
+      SolverPaidEvent.InputTuple,
+      SolverPaidEvent.OutputTuple,
+      SolverPaidEvent.OutputObject
     >;
-    SetPrecrime: TypedContractEvent<
-      SetPrecrimeEvent.InputTuple,
-      SetPrecrimeEvent.OutputTuple,
-      SetPrecrimeEvent.OutputObject
-    >;
-
-    "SetTrustedRemote(uint16,bytes)": TypedContractEvent<
-      SetTrustedRemoteEvent.InputTuple,
-      SetTrustedRemoteEvent.OutputTuple,
-      SetTrustedRemoteEvent.OutputObject
-    >;
-    SetTrustedRemote: TypedContractEvent<
-      SetTrustedRemoteEvent.InputTuple,
-      SetTrustedRemoteEvent.OutputTuple,
-      SetTrustedRemoteEvent.OutputObject
-    >;
-
-    "SetTrustedRemoteAddress(uint16,bytes)": TypedContractEvent<
-      SetTrustedRemoteAddressEvent.InputTuple,
-      SetTrustedRemoteAddressEvent.OutputTuple,
-      SetTrustedRemoteAddressEvent.OutputObject
-    >;
-    SetTrustedRemoteAddress: TypedContractEvent<
-      SetTrustedRemoteAddressEvent.InputTuple,
-      SetTrustedRemoteAddressEvent.OutputTuple,
-      SetTrustedRemoteAddressEvent.OutputObject
+    SolverPaid: TypedContractEvent<
+      SolverPaidEvent.InputTuple,
+      SolverPaidEvent.OutputTuple,
+      SolverPaidEvent.OutputObject
     >;
   };
 }

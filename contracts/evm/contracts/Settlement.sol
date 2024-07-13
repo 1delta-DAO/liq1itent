@@ -5,13 +5,14 @@ pragma solidity ^0.8.25;
 import {OrderLib} from "./libraries/OrderLib.sol";
 import {OrderSig} from "./libraries/OrderSig.sol";
 import {AddressLib} from "./libraries/AddressLib.sol";
-import {NonblockingLzApp} from "./lzApp/NonblockingLzApp.sol";
+import {OApp, MessagingFee, Origin} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OApp.sol";
+import {MessagingParams, MessagingFee, MessagingReceipt} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 import {IFillerOracle} from "./interfaces/IFillerOracle.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Settlement is Initializable, NonblockingLzApp {
+contract Settlement is Initializable, OApp {
     using AddressLib for bytes32;
     using SafeERC20 for IERC20;
 
@@ -78,17 +79,33 @@ contract Settlement is Initializable, NonblockingLzApp {
     mapping(uint32 => mapping(bytes32 => OrderData)) statuses;
     // destinationChainId -> orderHash -> notFillable
     mapping(uint32 => mapping(bytes32 => bool)) notFillable;
+    // only to make our live easier
+    mapping(uint32 => uint32) chainIdToEid;
+    mapping(uint32 => uint32) eidToChainId;
 
     /*//////////////////////////////////////////////////////////////
                                 CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
-    constructor(address endpoint) NonblockingLzApp(endpoint) {
+    constructor(
+        address endpoint,
+        address delegate
+    ) OApp(endpoint, delegate) Ownable(msg.sender) {
         uint256 cId;
         assembly {
             cId := chainid()
         }
         THIS_CHAIN_ID = cId;
+        chainIdToEid[137] = 30109; // polygon
+        chainIdToEid[5000] = 30181; // mantle
+        chainIdToEid[42161] = 30110; // arb
+        chainIdToEid[0] = 30168; // solana
+
+        eidToChainId[30109] = 137; // polygon
+        eidToChainId[30181] = 5000; // mantle
+        eidToChainId[30110] = 42161; // arb
+        eidToChainId[30168] = 0; // solana
+        REFUND_ADDRESS = payable(msg.sender);
     }
 
     /// @notice Initiates the settlement of a cross-chain order
@@ -161,7 +178,7 @@ contract Settlement is Initializable, NonblockingLzApp {
     function settle(
         bytes32 originAmountReceiver,
         OrderLib.CrossChainOrder calldata order,
-        bytes calldata adapterParams
+        bytes calldata endpointOptions
     ) external payable {
         // validate chain - destination id
         if (THIS_CHAIN_ID != order.destinationChainId)
@@ -172,12 +189,6 @@ contract Settlement is Initializable, NonblockingLzApp {
         // the destination chainId for layer 0
         // is the origin chainId of the order
         uint16 _layerZeroDstChainId = uint16(order.originChainId);
-        bytes memory trustedRemote = trustedRemoteLookup[_layerZeroDstChainId];
-        require(
-            trustedRemote.length != 0,
-            "LzApp: destination chain is not a trusted source"
-        );
-
         bytes32 orderHash = OrderLib.getHash(order);
 
         // revert if the order is filled
@@ -203,13 +214,25 @@ contract Settlement is Initializable, NonblockingLzApp {
             uint256(0)
         );
         // transmit the message
-        lzEndpoint.send{value: msg.value}(
-            _layerZeroDstChainId,
-            trustedRemote,
-            payload,
-            REFUND_ADDRESS,
-            msg.sender,
-            adapterParams
+        // endpoint.send{value: msg.value}(
+        //     _layerZeroDstChainId,
+        //     trustedRemote,
+        //     payload,
+        //     REFUND_ADDRESS,
+        //     msg.sender,
+        //     adapterParams
+        // );
+        // sending from destinationChainId -> originChainId
+        uint32 eId = chainIdToEid[order.originChainId];
+        endpoint.send{value: msg.value}(
+            MessagingParams(
+                eId,
+                _getPeerOrRevert(eId),
+                payload,
+                endpointOptions,
+                false
+            ),
+            REFUND_ADDRESS
         );
 
         emit FillingCompleted(orderHash);
@@ -217,7 +240,7 @@ contract Settlement is Initializable, NonblockingLzApp {
 
     function cancelOrder(
         OrderLib.CrossChainOrder calldata order,
-        bytes calldata adapterParams
+        bytes calldata endpointOptions
     ) external payable {
         // validate chain - destination id
         if (THIS_CHAIN_ID != order.destinationChainId)
@@ -225,14 +248,6 @@ contract Settlement is Initializable, NonblockingLzApp {
                 THIS_CHAIN_ID,
                 order.destinationChainId
             );
-        // the destination chainId for layer 0
-        // is the origin chainId of the order
-        uint16 _layerZeroDstChainId = uint16(order.originChainId);
-        bytes memory trustedRemote = trustedRemoteLookup[_layerZeroDstChainId];
-        require(
-            trustedRemote.length != 0,
-            "LzApp: destination chain is not a trusted source"
-        );
 
         require(
             order.destinationReceiver.toEvmAddress() == msg.sender,
@@ -255,32 +270,50 @@ contract Settlement is Initializable, NonblockingLzApp {
             bytes32(0),
             uint256(1) // 1 is cancelled
         );
+
+        uint32 eId = chainIdToEid[order.originChainId];
+        // struct MessagingParams {
+        //     uint32 dstEid;
+        //     bytes32 receiver;
+        //     bytes message;
+        //     bytes options;
+        //     bool payInLzToken;
+        // }
+
         // transmit the message
-        lzEndpoint.send{value: msg.value}(
-            _layerZeroDstChainId,
-            trustedRemote,
-            payload,
-            REFUND_ADDRESS,
-            msg.sender,
-            adapterParams
+        endpoint.send{value: msg.value}(
+            MessagingParams(
+                eId,
+                _getPeerOrRevert(eId),
+                payload,
+                endpointOptions,
+                false
+            ),
+            REFUND_ADDRESS
         );
 
         emit OrderCancelled(orderHash);
     }
 
-    function lzReceive(
-        uint16 _srcChainId,
-        bytes calldata _srcAddress,
-        uint64 _nonce,
-        bytes calldata _payload
-    ) public virtual override {
-        // the original `lzReceive` does the access check already
-        super.lzReceive(_srcChainId, _srcAddress, _nonce, _payload);
+    // struct Origin {
+    //     uint32 srcEid;
+    //     bytes32 sender;
+    //     uint64 nonce;
+    // }
+    function _lzReceive(
+        Origin calldata _origin,
+        bytes32 _guid,
+        bytes calldata _message,
+        address _executor,
+        bytes calldata _extraData
+    ) internal virtual override {
         // start business logic here
         (bytes32 orderHash, bytes32 receiver, OrderStatus fillStatus) = abi
-            .decode(_payload, (bytes32, bytes32, OrderStatus));
+            .decode(_message, (bytes32, bytes32, OrderStatus));
 
-        OrderData memory orderData = statuses[_srcChainId][orderHash];
+        OrderData memory orderData = statuses[eidToChainId[_origin.srcEid]][
+            orderHash
+        ];
         if (fillStatus == OrderStatus.FILLED) {
             // transfer maker amount to filler-defined receiver
             IERC20(orderData.makerToken.toEvmAddress()).safeTransfer(
@@ -315,38 +348,11 @@ contract Settlement is Initializable, NonblockingLzApp {
         statuses[order.destinationChainId][orderHash] = orderData;
     }
 
-    //@notice override this function
-    function _nonblockingLzReceive(
-        uint16 _srcChainId,
-        bytes memory _srcAddress,
-        uint64 _nonce,
-        bytes memory _payload
-    ) internal virtual override {}
-
     function _encodeSendPayload(
         bytes32 _toAddress,
         bytes32 _orderHash
     ) internal view virtual returns (bytes memory) {
         return abi.encodePacked(_orderHash, _toAddress, uint256(0));
-    }
-
-    function estimateSendFee(
-        uint16 _dstChainId,
-        bytes32 _toAddress,
-        bytes32 _orderHash,
-        bool _useZro,
-        bytes memory _adapterParams
-    ) external view virtual returns (uint nativeFee, uint zroFee) {
-        // mock the payload for sendFrom()
-        bytes memory payload = _encodeSendPayload(_orderHash, _toAddress);
-        return
-            lzEndpoint.estimateFees(
-                _dstChainId,
-                address(this),
-                payload,
-                _useZro,
-                _adapterParams
-            );
     }
 
     // Only for the hackathon in case some funds get stuck
@@ -362,5 +368,34 @@ contract Settlement is Initializable, NonblockingLzApp {
                 IERC20(asset).balanceOf(address(this)) //
             );
         }
+    }
+
+    /**
+     * @dev Internal function to interact with the LayerZero EndpointV2.quote() for fee calculation.
+     * @param _dstEid The destination endpoint ID.
+     * @param _message The message payload.
+     * @param _options Additional options for the message.
+     * @param _payInLzToken Flag indicating whether to pay the fee in LZ tokens.
+     * @return fee The calculated MessagingFee for the message.
+     *      - nativeFee: The native fee for the message.
+     *      - lzTokenFee: The LZ token fee for the message.
+     */
+    function quote(
+        uint32 _dstEid,
+        bytes memory _message,
+        bytes memory _options,
+        bool _payInLzToken
+    ) external view returns (MessagingFee memory fee) {
+        return
+            endpoint.quote(
+                MessagingParams(
+                    _dstEid,
+                    _getPeerOrRevert(_dstEid),
+                    _message,
+                    _options,
+                    _payInLzToken
+                ),
+                address(this)
+            );
     }
 }

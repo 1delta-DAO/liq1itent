@@ -1,9 +1,14 @@
+export  enum ChainId {
+    MANTLE = 5000,
+    POLYGON = 137,
+}
+
 export const SETTLEMENT_ADDRESSES = {
-    [5000]: '',
-    [137]: ''
+    [ChainId.MANTLE]: '',
+    [ChainId.POLYGON]: ''
 }
 
 export const ENDPOINT_ADDRESSES = {
-    [5000]: '0x1a44076050125825900e736c501f859c50fE728c',
-    [137]: '0x1a44076050125825900e736c501f859c50fE728c'
+    [ChainId.MANTLE]: '0x1a44076050125825900e736c501f859c50fE728c',
+    [ChainId.POLYGON]: '0x1a44076050125825900e736c501f859c50fE728c'
 }

@@ -9,7 +9,4 @@ import type * as lzApp from "./lzApp";
 export type { lzApp };
 import type * as mock from "./mock";
 export type { mock };
-import type * as oft from "./oft";
-export type { oft };
-export type { FillerOracle } from "./FillerOracle";
 export type { Settlement } from "./Settlement";

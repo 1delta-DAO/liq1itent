@@ -3,5 +3,3 @@
 /* eslint-disable */
 export * as interfaces from "./interfaces";
 export * as mocks from "./mocks";
-export { LzApp__factory } from "./LzApp__factory";
-export { NonblockingLzApp__factory } from "./NonblockingLzApp__factory";
