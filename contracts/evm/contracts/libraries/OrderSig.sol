@@ -2,23 +2,12 @@
 
 pragma solidity ^0.8.25;
 
-
 library OrderSig {
     error BadSignature(bytes32 hash);
 
     // '\x19Ethereum Signed Message:\n32\x00\x00\x00\x00' in a word.
     uint256 private constant ETH_SIGN_HASH_PREFIX =
         0x19457468657265756d205369676e6564204d6573736167653a0a333200000000;
-    /// @dev Exclusive upper limit on ECDSA signatures 'R' values.
-    ///      The valid range is given by fig (282) of the yellow paper.
-    uint256 private constant ECDSA_SIGNATURE_R_LIMIT =
-        uint256(
-            0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
-        );
-    /// @dev Exclusive upper limit on ECDSA signatures 'S' values.
-    ///      The valid range is given by fig (283) of the yellow paper.
-    uint256 private constant ECDSA_SIGNATURE_S_LIMIT =
-        ECDSA_SIGNATURE_R_LIMIT / 2 + 1;
 
     uint256 internal constant UINT8_MASK = 0xff;
 
