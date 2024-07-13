@@ -9,7 +9,7 @@ import {NonblockingLzApp} from "./lzApp/NonblockingLzApp.sol";
 import {IFillerOracle} from "./interfaces/IFillerOracle.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "hardhat/console.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Settlement is Initializable, NonblockingLzApp {
     using AddressLib for bytes32;
@@ -64,6 +64,7 @@ contract Settlement is Initializable, NonblockingLzApp {
 
     address payable public REFUND_ADDRESS;
     uint256 public THIS_CHAIN_ID;
+    uint256 public ld2sdRate;
     mapping(uint32 => mapping(bytes32 => OrderData)) statuses;
 
     /*//////////////////////////////////////////////////////////////
@@ -154,8 +155,9 @@ contract Settlement is Initializable, NonblockingLzApp {
                 THIS_CHAIN_ID,
                 order.destinationChainId
             );
-
-        uint16 _dstChainId = uint16(order.destinationChainId);
+        // the destination chainId for layer 0
+        // is the origin chainId of the order
+        uint16 _dstChainId = uint16(order.originChainId);
         bytes memory trustedRemote = trustedRemoteLookup[_dstChainId];
         require(
             trustedRemote.length != 0,
@@ -221,6 +223,7 @@ contract Settlement is Initializable, NonblockingLzApp {
         }
     }
 
+    // we log the order as pending
     function _reportSettlementAttempt(
         OrderLib.CrossChainOrder calldata order,
         bytes32 orderHash
@@ -242,4 +245,30 @@ contract Settlement is Initializable, NonblockingLzApp {
         uint64 _nonce,
         bytes memory _payload
     ) internal virtual override {}
+
+    function _encodeSendPayload(
+        bytes32 _toAddress,
+        bytes32 _orderHash
+    ) internal view virtual returns (bytes memory) {
+        return abi.encodePacked(_orderHash, _toAddress, uint256(0));
+    }
+
+    function estimateSendFee(
+        uint16 _dstChainId,
+        bytes32 _toAddress,
+        bytes32 _orderHash,
+        bool _useZro,
+        bytes memory _adapterParams
+    ) external view virtual returns (uint nativeFee, uint zroFee) {
+        // mock the payload for sendFrom()
+        bytes memory payload = _encodeSendPayload(_orderHash, _toAddress);
+        return
+            lzEndpoint.estimateFees(
+                _dstChainId,
+                address(this),
+                payload,
+                _useZro,
+                _adapterParams
+            );
+    }
 }

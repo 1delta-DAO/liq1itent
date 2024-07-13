@@ -12,7 +12,9 @@ import {
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers"
 import { expect } from "chai";
 import { CrossChainOrder, getHash, getOrder, padAddress } from "./utils";
-import { ethSignHashWithProviderAsync } from "./utils/signature_utils";
+import { getPackedSig } from "./utils/signature_utils";
+import { randomBytes } from "crypto";
+import { NULL_BYTES } from "@0x/utils";
 
 describe("EvmOrder: ", function () {
     const localChainId = 1
@@ -103,15 +105,12 @@ describe("EvmOrder: ", function () {
             originChainId: localChainId
         })
         const hash = getHash(order)
-        const vrsSig = await ethSignHashWithProviderAsync(hash, swapper)
-        const packedSig = solidityPacked(
-            ['uint8', 'bytes32', 'bytes32'],
-            [vrsSig.v, vrsSig.r, vrsSig.s]
-        )
+        const vrsSig = await getPackedSig(hash, swapper)
+
         await localSettlement.verifySignature(
             hash,
             order.swapper,
-            packedSig
+            vrsSig
         )
     })
 
@@ -121,18 +120,15 @@ describe("EvmOrder: ", function () {
             originChainId: localChainId
         })
         const hash = getHash(order)
-        const vrsSig = await ethSignHashWithProviderAsync(hash, swapper)
-        const packedSig = solidityPacked(
-            ['uint8', 'bytes32', 'bytes32'],
-            [vrsSig.v, vrsSig.r, vrsSig.s]
-        )
+        const vrsSig = await getPackedSig(hash, swapper)
+
         try {
             // amend something in the order
             const falseHash = getHash({ ...order, originChainId: 99 })
             await localSettlement.verifySignature(
                 falseHash,
                 order.swapper,
-                packedSig
+                vrsSig
             )
             expect(true).to.equals(false, "did not revert")
         } catch (e: any) { }
@@ -140,62 +136,76 @@ describe("EvmOrder: ", function () {
 
     it("fill x-chain order converntionally", async function () {
         const sellAmount = parseEther("1.00000001") // 1 ether
+        const buyAmount = parseEther("0.50000001") // 1 ether
+
+
 
         await localErc20.mint(swapperAddress, sellAmount)
+        await remoteErc20.mint(solverAddress, buyAmount)
 
         // verify alice has tokens and bob has no tokens on remote chain
         expect(await localErc20.balanceOf(swapperAddress)).to.be.equal(sellAmount)
-        expect(await remoteErc20.balanceOf(solverAddress)).to.be.equal(0)
+        expect(await remoteErc20.balanceOf(solverAddress)).to.be.equal(buyAmount)
 
-        // // alice sends tokens to bob on remote chain
-        // // approve the proxy to swap your tokens
-        // await localErc20.connect(swapper).approve(localOFTAddress, initialAmount)
+        // define order
+        const order: CrossChainOrder = getOrder({
+            swapper: padAddress(swapperAddress),
+            originChainId: localChainId,
+            originToken: padAddress(localErc20Address),
+            destinationToken: padAddress(remoteErc20Address),
+            destinationReceiver: padAddress(swapperAddress),
+            originAmount: sellAmount,
+            destinationAmount: buyAmount,
+            destinationChainId: remoteChainId
+        })
+        const hash = getHash(order)
 
-        // // swaps token to remote chain
-        // const bobAddressBytes32 = (new ethers.AbiCoder()).encode(["address"], [solverAddress])
-        // let nativeFee = (await localOFT.estimateSendFee(remoteChainId, bobAddressBytes32, initialAmount, false, defaultAdapterParams)).nativeFee
-        // await localOFT
-        //     .connect(swapper)
-        //     .sendFrom(
-        //         swapperAddress,
-        //         remoteChainId,
-        //         bobAddressBytes32,
-        //         initialAmount,
-        //         [swapperAddress, ZeroAddress, defaultAdapterParams] as any,
-        //         { value: nativeFee }
-        //     )
+        // swapper signs order on origin chai
+        const signature = await getPackedSig(hash, swapper)
 
-        // // tokens are now owned by the proxy contract, because this is the original oft chain
-        // expect(await localErc20.balanceOf(localOFTAddress)).to.equal(amount)
-        // expect(await localErc20.balanceOf(swapperAddress)).to.equal(dust)
+        // swapper needs to approve settlement
+        localErc20.connect(swapper).approve(
+            localSettlementAddress,
+            sellAmount
+        )
+        console.log("initiate")
+        // solver initiates solving
+        await localSettlement.connect(solver).initiate(
+            order,
+            signature,
+            '0x'
+        )
 
-        // // tokens received on the remote chain
-        // expect(await remoteOFT.totalSupply()).to.equal(amount)
-        // expect(await remoteOFT.balanceOf(solverAddress)).to.be.equal(amount)
+        // solver needs to approve remote settlement
+        remoteErc20.connect(solver).approve(
+            remoteSettlementAddress,
+            buyAmount
+        )
 
-        // // bob send tokens back to alice from remote chain
-        // const aliceAddressBytes32 = abiCoder.encode(["address"], [swapperAddress])
-        // const halfAmount = amount / 2n
-        // nativeFee = (await remoteOFT.estimateSendFee(localChainId, aliceAddressBytes32, halfAmount, false, defaultAdapterParams)).nativeFee
-        // await remoteOFT
-        //     .connect(solver)
-        //     .sendFrom(
-        //         solverAddress,
-        //         localChainId,
-        //         aliceAddressBytes32,
-        //         halfAmount,
-        //         [solverAddress, ZeroAddress, defaultAdapterParams] as any,
-        //         { value: nativeFee }
-        //     )
+        let nativeFee = (await localSettlement.estimateSendFee(
+            remoteChainId,
+            padAddress(solverAddress),
+            hash,
+            false,
+            defaultAdapterParams
+        )
+        ).nativeFee
 
-        // // half tokens are burned on the remote chain
-        // expect(await remoteOFT.totalSupply()).to.equal(halfAmount)
-        // expect(await remoteOFT.balanceOf(solverAddress)).to.be.equal(halfAmount)
+        console.log("settle")
+        await remoteSettlement.connect(solver).settle(
+            padAddress(solverAddress),
+            order,
+            defaultAdapterParams,
+            { value: nativeFee }
+        )
 
-        // // tokens received on the local chain and unlocked from the proxy
-        // expect(await localErc20.balanceOf(localOFTAddress)).to.be.equal(halfAmount)
-        // // console.log(halfAmount, dust, typeof halfAmount, typeof dust)
-        // // console.log(halfAmount.add(dust), typeof halfAmount.add(dust))
-        // expect(await localErc20.balanceOf(swapperAddress)).to.be.equal(halfAmount + dust)
+        const balanceSwapperDestination = await remoteErc20.balanceOf(swapperAddress)
+        const balanceSolverOrigin = await localErc20.balanceOf(solverAddress)
+
+        // verify that the swapper receives their amount
+        expect(balanceSwapperDestination).to.equal(buyAmount)
+        // verify that the solver receives the amount from the swapper
+        expect(balanceSolverOrigin).to.equal(sellAmount)
+        
     })
 })

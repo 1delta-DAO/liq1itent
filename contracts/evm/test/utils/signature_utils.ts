@@ -14,12 +14,23 @@ export interface ECSignature {
 /**
  * Sign a hash with the EthSign signature type on a provider.
  */
-export async function ethSignHashWithProviderAsync(
+async function ethSignHashWithProviderAsync(
     hash: string,
     signer: SignerWithAddress,
 ): Promise<ECSignature> {
     const rpcSig = await signer.signMessage(ethers.getBytes(hash));
     return parseRpcSignature(rpcSig)
+}
+
+export async function getPackedSig(
+    hash: string,
+    signer: SignerWithAddress,
+): Promise<string> {
+    const vrsSig = await ethSignHashWithProviderAsync(hash, signer)
+    return ethers.solidityPacked(
+        ['uint8', 'bytes32', 'bytes32'],
+        [vrsSig.v, vrsSig.r, vrsSig.s]
+    )
 }
 
 // Parse a hex signature returned by an RPC call into an `ECSignature`.

@@ -132,6 +132,7 @@ export interface SettlementInterface extends Interface {
       | "DEFAULT_PAYLOAD_SIZE_LIMIT"
       | "REFUND_ADDRESS"
       | "THIS_CHAIN_ID"
+      | "estimateSendFee"
       | "failedMessages"
       | "forceResumeReceive"
       | "getConfig"
@@ -140,6 +141,7 @@ export interface SettlementInterface extends Interface {
       | "getTrustedRemoteAddress"
       | "initiate"
       | "isTrustedRemote"
+      | "ld2sdRate"
       | "lzEndpoint"
       | "lzReceive"
       | "minDstGasLookup"
@@ -189,6 +191,10 @@ export interface SettlementInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "estimateSendFee",
+    values: [BigNumberish, BytesLike, BytesLike, boolean, BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "failedMessages",
     values: [BigNumberish, BytesLike, BigNumberish]
   ): string;
@@ -220,6 +226,7 @@ export interface SettlementInterface extends Interface {
     functionFragment: "isTrustedRemote",
     values: [BigNumberish, BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "ld2sdRate", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "lzEndpoint",
     values?: undefined
@@ -316,6 +323,10 @@ export interface SettlementInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "estimateSendFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "failedMessages",
     data: BytesLike
   ): Result;
@@ -341,6 +352,7 @@ export interface SettlementInterface extends Interface {
     functionFragment: "isTrustedRemote",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "ld2sdRate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lzEndpoint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lzReceive", data: BytesLike): Result;
   decodeFunctionResult(
@@ -600,6 +612,18 @@ export interface Settlement extends BaseContract {
 
   THIS_CHAIN_ID: TypedContractMethod<[], [bigint], "view">;
 
+  estimateSendFee: TypedContractMethod<
+    [
+      _dstChainId: BigNumberish,
+      _toAddress: BytesLike,
+      _orderHash: BytesLike,
+      _useZro: boolean,
+      _adapterParams: BytesLike
+    ],
+    [[bigint, bigint] & { nativeFee: bigint; zroFee: bigint }],
+    "view"
+  >;
+
   failedMessages: TypedContractMethod<
     [arg0: BigNumberish, arg1: BytesLike, arg2: BigNumberish],
     [string],
@@ -652,6 +676,8 @@ export interface Settlement extends BaseContract {
     [boolean],
     "view"
   >;
+
+  ld2sdRate: TypedContractMethod<[], [bigint], "view">;
 
   lzEndpoint: TypedContractMethod<[], [string], "view">;
 
@@ -811,6 +837,19 @@ export interface Settlement extends BaseContract {
     nameOrSignature: "THIS_CHAIN_ID"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "estimateSendFee"
+  ): TypedContractMethod<
+    [
+      _dstChainId: BigNumberish,
+      _toAddress: BytesLike,
+      _orderHash: BytesLike,
+      _useZro: boolean,
+      _adapterParams: BytesLike
+    ],
+    [[bigint, bigint] & { nativeFee: bigint; zroFee: bigint }],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "failedMessages"
   ): TypedContractMethod<
     [arg0: BigNumberish, arg1: BytesLike, arg2: BigNumberish],
@@ -867,6 +906,9 @@ export interface Settlement extends BaseContract {
     [boolean],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "ld2sdRate"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "lzEndpoint"
   ): TypedContractMethod<[], [string], "view">;
