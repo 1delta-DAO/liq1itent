@@ -19,12 +19,21 @@ contract Settlement is Initializable, NonblockingLzApp {
                                 ERRORS
     //////////////////////////////////////////////////////////////*/
 
+    event FillingInititated(bytes32 hash);
+    event FillingCompleted(bytes32 hash);
+    event SolverPaid(bytes32 hash);
+    event OrderCancelled(bytes32 hash);
+
+    /*//////////////////////////////////////////////////////////////
+                                ERRORS
+    //////////////////////////////////////////////////////////////*/
+
     error NotTooRelevantRightNow();
     error InvalidOrderSignature(bytes32 hash);
     error CallerNotMakerOrTaker();
     error AlreadyFilled(bytes32 hash);
     error NoPartialFills(bytes32 hash);
-    error AlreadyFiled(bytes32 hash);
+    error NotFillable(bytes32 hash);
     error BadOriginChainId(uint256 expectedChainId, uint256 providedChainId);
     error BadDestinationChainId(
         uint256 expectedChainId,
@@ -67,8 +76,8 @@ contract Settlement is Initializable, NonblockingLzApp {
     uint256 public THIS_CHAIN_ID;
     // destinationChainId -> orderHash -> data
     mapping(uint32 => mapping(bytes32 => OrderData)) statuses;
-    // destinationChainId -> orderHash -> isFilled
-    mapping(uint32 => mapping(bytes32 => bool)) filled;
+    // destinationChainId -> orderHash -> notFillable
+    mapping(uint32 => mapping(bytes32 => bool)) notFillable;
 
     /*//////////////////////////////////////////////////////////////
                                 CONSTRUCTOR
@@ -113,6 +122,8 @@ contract Settlement is Initializable, NonblockingLzApp {
             address(this),
             order.originAmount
         );
+
+        emit FillingInititated(orderHash);
     }
 
     function getOrderTypeHash() external view returns (bytes32) {
@@ -171,9 +182,9 @@ contract Settlement is Initializable, NonblockingLzApp {
 
         // revert if the order is filled
         // then set it as filled
-        if (filled[order.destinationChainId][orderHash])
-            revert AlreadyFiled(orderHash);
-        else filled[order.destinationChainId][orderHash] = true;
+        if (notFillable[order.destinationChainId][orderHash])
+            revert NotFillable(orderHash);
+        else notFillable[order.destinationChainId][orderHash] = true;
 
         // Fill the order by transferring funds from the caller to the
         // receiver
@@ -200,6 +211,61 @@ contract Settlement is Initializable, NonblockingLzApp {
             msg.sender,
             adapterParams
         );
+
+        emit FillingCompleted(orderHash);
+    }
+
+    function cancelOrder(
+        OrderLib.CrossChainOrder calldata order,
+        bytes calldata adapterParams
+    ) external payable {
+        // validate chain - destination id
+        if (THIS_CHAIN_ID != order.destinationChainId)
+            revert BadDestinationChainId(
+                THIS_CHAIN_ID,
+                order.destinationChainId
+            );
+        // the destination chainId for layer 0
+        // is the origin chainId of the order
+        uint16 _layerZeroDstChainId = uint16(order.originChainId);
+        bytes memory trustedRemote = trustedRemoteLookup[_layerZeroDstChainId];
+        require(
+            trustedRemote.length != 0,
+            "LzApp: destination chain is not a trusted source"
+        );
+
+        require(
+            order.destinationReceiver.toEvmAddress() == msg.sender,
+            "Only destiantion receiver can cancel"
+        );
+
+        bytes32 orderHash = OrderLib.getHash(order);
+
+        // revert if the order is filled
+        // then set it as filled
+        if (notFillable[order.destinationChainId][orderHash])
+            revert NotFillable(orderHash);
+        else notFillable[order.destinationChainId][orderHash] = true;
+
+        // we set the status to FILLED per default
+        // thereretically, many variations are possible here, e.g.
+        // partial fills
+        bytes memory payload = abi.encodePacked(
+            orderHash,
+            bytes32(0),
+            uint256(1) // 1 is cancelled
+        );
+        // transmit the message
+        lzEndpoint.send{value: msg.value}(
+            _layerZeroDstChainId,
+            trustedRemote,
+            payload,
+            REFUND_ADDRESS,
+            msg.sender,
+            adapterParams
+        );
+
+        emit OrderCancelled(orderHash);
     }
 
     function lzReceive(
@@ -221,6 +287,7 @@ contract Settlement is Initializable, NonblockingLzApp {
                 receiver.toEvmAddress(),
                 orderData.makerAmount
             );
+            emit SolverPaid(orderHash);
         }
         // user cancelled on destination chain
         else if (fillStatus == OrderStatus.CANCELLED) {
@@ -229,6 +296,7 @@ contract Settlement is Initializable, NonblockingLzApp {
                 orderData.maker.toEvmAddress(),
                 orderData.makerAmount
             );
+            emit OrderCancelled(orderHash);
         }
     }
 
@@ -279,5 +347,20 @@ contract Settlement is Initializable, NonblockingLzApp {
                 _useZro,
                 _adapterParams
             );
+    }
+
+    // Only for the hackathon in case some funds get stuck
+    function emergencyWithdraw(address asset) external onlyOwner {
+        if (asset == address(0)) {
+            (bool success, ) = payable(msg.sender).call{
+                value: address(this).balance
+            }("");
+            require(success, "native transfer failed");
+        } else {
+            IERC20(asset).safeTransfer(
+                msg.sender,
+                IERC20(asset).balanceOf(address(this)) //
+            );
+        }
     }
 }

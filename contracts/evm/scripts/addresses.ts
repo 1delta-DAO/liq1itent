@@ -1,0 +1,9 @@
+export const SETTLEMENT_ADDRESSES = {
+    [5000]: '',
+    [137]: ''
+}
+
+export const ENDPOINT_ADDRESSES = {
+    [5000]: '0x1a44076050125825900e736c501f859c50fE728c',
+    [137]: '0x1a44076050125825900e736c501f859c50fE728c'
+}

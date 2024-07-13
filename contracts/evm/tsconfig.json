@@ -20,7 +20,8 @@
   },
   "include": [
     "test",
-    "utils"
+    "utils",
+    "scripts"
   ],
   "files": [
     "hardhat.config.ts"

@@ -1,8 +1,5 @@
-import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { BigNumberish, getAddress, keccak256, MaxUint256, solidityPacked } from "ethers";
-import { ECSignature, ethSignHashWithProviderAsync } from "./signature_utils";
 import { randomBytes } from "crypto";
-import { hexUtils } from "@0x/utils";
 
 export interface CrossChainOrder {
     /// @dev The contract address that the order is meant to be settled by.
@@ -105,13 +102,6 @@ export function getRandomInteger(min: BigNumberish, max: BigNumberish): bigint {
     const range = BigInt(max) - BigInt(min);
     const bts = BigInt('0x' + randomBytes(32).toString('hex'))
     return BigInt(min) + range * bts / MaxUint256;
-}
-
-
-export async function signOrder(
-    order: CrossChainOrder,
-    signer: SignerWithAddress): Promise<ECSignature> {
-    return await ethSignHashWithProviderAsync(getHash(order), signer)
 }
 
 export function getOrder(opts: Partial<CrossChainOrder> = {}): CrossChainOrder {
