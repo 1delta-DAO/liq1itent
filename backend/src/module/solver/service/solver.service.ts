@@ -21,7 +21,9 @@ export class SolverService {
     for (const order of orders) {
       console.log(order);
       const rpc = await findWorkingRpc(order.originChainId);
-      const settlement = getSettlementContract(order.originChainId, rpc);
+      const pk = this.configService.get("WALLET_PK");
+      const signer = new ethers.Wallet(pk, ethers.getDefaultProvider(rpc));
+      const settlement = getSettlementContract(order.originChainId, signer);
       if (!settlement) {
         console.log(
           "No settlement contract found for chainId",
@@ -30,8 +32,6 @@ export class SolverService {
         continue;
       }
 
-      const pk = this.configService.get("WALLET_PK");
-      const signer = new ethers.Wallet(pk, rpc);
       console.log("signer", signer);
       settlement.connect(signer);
       const res = await settlement.initiate(
