@@ -104,8 +104,9 @@ export const TradeComponent: React.FC = () => {
 
   }
 
-  const onTypeInput = () => { }
-
+  function onTypeInput(e:any) {
+    setInput(e.target.value);
+}
   const renderButton = (): React.ReactNode => {
     if (parseUnits(input, selectedCoinMemo?.decimals).gte(amountApproved)) {
       return (
@@ -131,14 +132,7 @@ export const TradeComponent: React.FC = () => {
   return (
     <div className={styles["trade"]}>
       <div className={styles["panel"]}>
-        <div className={styles["buysell"]}>
-          <div className={styles["buy"]}>Buy/Long</div>
-          <div className={styles["sell"]}>Sell/Short</div>
-        </div>
         <div className={styles["collateral-balance"]}>
-          <div className={styles["collateral-amount"]}>
-            Pay: ${(Number(input) * 0.9998).toLocaleString()}
-          </div>
           <div className={styles["balance"]}>Balance: {balance}</div>
         </div>
         <div className={styles["collateral"]}>
