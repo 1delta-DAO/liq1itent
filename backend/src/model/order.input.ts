@@ -7,7 +7,7 @@ export class OrderInput {
   @Length(32, 44)
   @ApiProperty({
     type: String,
-    example: "0xE0582D2AbadAaa310EC35F56c56259c15C464F17",
+    example: "0x1F9C950BF6eF4c7032A60c8194eE60F858f1Ea9e",
     required: true,
   })
   swapperWallet: string;

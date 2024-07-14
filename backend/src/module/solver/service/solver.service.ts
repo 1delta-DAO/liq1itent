@@ -35,8 +35,12 @@ export class SolverService {
         continue;
       }
       const orderPayload = this.orderToPayload(order);
-      console.log(orderPayload);
-      const res = await settlement.initiate(orderPayload, "0x", "0x");
+      console.log("Calling settlement.initiate with", orderPayload);
+      const res = await settlement.initiate(
+        orderPayload,
+        order.signature,
+        "0x"
+      );
       console.log(res);
     }
   }
@@ -57,9 +61,9 @@ export class SolverService {
         blockchainsConfig[order.destinationChainId].settlementAddress
       ),
       originToken: this.padAddress(order.originToken),
-      originAmount: order.originAmount,
+      originAmount: BigInt(order.originAmount),
       destinationToken: this.padAddress(order.destinationToken),
-      destinationAmount: order.destinationAmount,
+      destinationAmount: BigInt(order.destinationAmount),
     };
   }
 
