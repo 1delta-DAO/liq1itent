@@ -17,13 +17,13 @@ async function main() {
 
     const token: WETH9 = await new WETH9__factory(operator).attach(WRAPPED_NATIVE[chainId]) as any
 
-    // console.log("approve")
-    // let tx = await token.approve(SETTLEMENT_ADDRESSES[chainId], orderSample.destinationAmount)
-    // await tx.wait()
+    console.log("approve")
+    let tx = await token.approve(SETTLEMENT_ADDRESSES[chainId], orderSample.destinationAmount)
+    await tx.wait()
 
-    // console.log("deposit")
-    // await token.deposit({ value: orderSample.destinationAmount })
-    // await tx.wait()
+    console.log("deposit")
+    await token.deposit({ value: orderSample.destinationAmount })
+    await tx.wait()
 
     // get settlement contract
     const settlement: Settlement = await new Settlement__factory(operator).attach(SETTLEMENT_ADDRESSES[chainId]) as any
@@ -31,11 +31,8 @@ async function main() {
     const options = Options.newOptions().addExecutorLzReceiveOption(650000, 0).toHex().toString()
 
     const testMessage = solidityPacked(['bytes32', 'bytes32'], [getHash(orderSample), padAddress(operator.address)])
+    
     // Define native fee and quote for the message send operation
-
-    console.log("calldata", Settlement__factory.createInterface().encodeFunctionData("quote",
-        [ENDPOINT_IDS[ChainId.MANTLE], testMessage, options, false]
-    ))
     let nativeFee = 0n;
     try {
         ;[nativeFee] = await settlement.quote.staticCall(ENDPOINT_IDS[ChainId.MANTLE], testMessage, options, false)

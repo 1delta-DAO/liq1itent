@@ -2,11 +2,12 @@
 import { ethers } from "hardhat";
 import { WETH9, WETH9__factory } from "../types";
 import { ChainId, getConfig, SETTLEMENT_ADDRESSES, WRAPPED_NATIVE } from "./dataMappings";
+import { orderSample } from "./order";
 
-const amount = 1e12
+const amount = orderSample.originAmount
 
 async function main() {
-    const [operator] = await ethers.getSigners()
+    const [_, operator] = await ethers.getSigners()
     const chainId = ChainId.MANTLE
 
     const config = getConfig(chainId)

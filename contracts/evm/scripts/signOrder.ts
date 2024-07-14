@@ -4,7 +4,8 @@ import { ChainId, WRAPPED_NATIVE } from "./dataMappings";
 import { getHash, getOrder, padAddress } from "../test/utils";
 import { getPackedSig } from "../test/utils/signature_utils";
 
-const amount = 1e12
+const amountIn = 2e18
+const amountOut = 15e17
 
 // define order
 const order = (user: string, from: number, to: number) => getOrder({
@@ -13,12 +14,12 @@ const order = (user: string, from: number, to: number) => getOrder({
     originToken: padAddress(WRAPPED_NATIVE[from]),
     destinationToken: padAddress(WRAPPED_NATIVE[to]),
     destinationReceiver: padAddress(user),
-    originAmount: BigInt(amount),
-    destinationAmount: BigInt(amount),
+    originAmount: BigInt(amountIn),
+    destinationAmount: BigInt(amountOut),
     destinationChainId: to
 })
 async function main() {
-    const [operator] = await ethers.getSigners()
+    const [_, operator] = await ethers.getSigners()
     const chainId = ChainId.MANTLE
     const destChainId = ChainId.POLYGON
     const preppedOrder = order(operator.address, chainId, destChainId)

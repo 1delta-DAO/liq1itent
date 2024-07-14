@@ -16,6 +16,7 @@ const accounts = {
 };
 
 const pk: string = process.env.PK || '';
+const pk1: string = process.env.PK_1 || '';
 
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
@@ -70,16 +71,13 @@ const config: HardhatUserConfig = {
       gasPrice: 22000000000,
     },
     matic: {
-      // url: 'https://matic-mainnet.chainstacklabs.com',
-      // url: 'https://rpc-mainnet.maticvigil.com',
       url: 'https://1rpc.io/matic',
-      // url:  `https://polygon-mainnet.public.blastapi.io`,
-      accounts: [pk],
+      accounts: [pk, pk1],
       chainId: 137,
     },
     mantle: {
       url: 'https://rpc.mantle.xyz',
-      accounts: [pk],
+      accounts: [pk, pk1],
       chainId: 5000,
     },
     xdai: {
