@@ -36,7 +36,7 @@ export class SolverService {
       }
       const orderPayload = this.orderToPayload(order);
       console.log(orderPayload);
-      const res = await settlement.initiate(orderPayload, "0x", "");
+      const res = await settlement.initiate(orderPayload, "0x", "0x");
       console.log(res);
     }
   }
