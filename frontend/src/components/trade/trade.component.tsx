@@ -28,6 +28,7 @@ import { RegisteredSubscription } from "web3-eth";
 import {
   ALL_COINS,
 } from "../../config/coins.config";
+import { useSignOrder } from "../../hooks/useSignOrder";
 
 interface TradeProps {
   getWeb3Provider: (chainId: number) => Promise<Web3<RegisteredSubscription> | undefined>;
@@ -41,12 +42,14 @@ export const TradeComponent: FunctionComponent<TradeProps> = (
   const [selectedTokenIndex, setSelectedTokenIndex] = useState<number>(0);
   const [selectedTokenOutIndex, setSelectedTokenOutIndex] = useState<number>(1);
   const [selectedChain, setChain] = useState<number>(5000);
+  const [selectedChainOut, setChainOut] = useState<number>(137);
   const [provider, setProvider] = useState<Web3<RegisteredSubscription> | undefined>(undefined);
 
   const [input, setInput] = useState("0");
   const [amountApproved, setAmountApproved] = useState("0");
   const { account } = useWeb3React<JsonRpcProvider>();
   const { approveTokenTo, getAmountApprovedFor } = useApprove();
+  const { signOrder, constructOrder } = useSignOrder();
 
   useEffect(() => {
     const fetchProvider = async (): Promise<void> => {
@@ -55,8 +58,6 @@ export const TradeComponent: FunctionComponent<TradeProps> = (
     };
     fetchProvider();
   }, [selectedChain]);
-
-  //provider.eth.call
 
   const tokens = useMemo(
     () =>
@@ -74,6 +75,13 @@ export const TradeComponent: FunctionComponent<TradeProps> = (
       ALL_COINS.find((x) => x?.name === tokens?.[selectedTokenIndex]?.label),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedTokenIndex]
+  );
+
+  const selectedCoinMemoOut = useMemo(
+    () =>
+      ALL_COINS.find((x) => x?.name === tokens?.[selectedTokenOutIndex]?.label),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTokenOutIndex]
   );
 
   const balance = 3214;
@@ -121,8 +129,15 @@ export const TradeComponent: FunctionComponent<TradeProps> = (
     }
   };
 
-  const onActionButtonClicked = () => {
-
+  const onActionButtonClicked = async () => {
+    const userAddress = provider ? (await provider.eth.getAccounts())[0] ?? "" : "";
+    const amountIn = amountApproved;
+    const amountOut = amountApproved;
+    const tokenIn = selectedCoinMemo?.address ?? "";
+    const tokenOut = selectedCoinMemoOut?.address ?? "";
+    const chainIn = selectedChain.toString();
+    const chainOut = selectedChainOut.toString();
+    const order = constructOrder(userAddress, amountIn, amountOut, tokenIn, tokenOut, chainIn, chainOut);
   }
 
   function onTypeInput(e:any) {
