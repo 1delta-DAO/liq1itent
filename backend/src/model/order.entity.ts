@@ -7,9 +7,6 @@ export class OrderEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: "settlement_contract" })
-  settlementContract: string;
-
   @Column({ name: "swapper_wallet" })
   swapperWallet: string;
 

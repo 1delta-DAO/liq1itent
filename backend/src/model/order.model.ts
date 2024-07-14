@@ -2,7 +2,6 @@ import { OrderStatus } from "./order-status.enum";
 import { WalletType } from "./wallet-type.enum";
 
 export class Order {
-  settlementContract: string;
   swapperWallet: string;
   swapperWalletType: WalletType;
   status: OrderStatus;
