@@ -10,6 +10,9 @@ import { OrderLib } from "../../../types/Settlement";
 import { Order } from "../../../model/order.model";
 import { ethers } from "ethers";
 import { ConfigService } from "@nestjs/config";
+import { solidityPack } from "ethers/lib/utils";
+
+const defaultAdapterParams = solidityPack(["uint16", "uint256"], [1, 200000]);
 
 @Injectable()
 export class SolverService {
@@ -23,11 +26,25 @@ export class SolverService {
 
     for (const order of orders) {
       console.log(order);
-      const rpc = await findWorkingRpc(order.originChainId);
+      const sourceChainRpc = await findWorkingRpc(order.originChainId);
+      const destinationChainRpc = await findWorkingRpc(
+        order.destinationChainId
+      );
       const pk = this.configService.get("WALLET_PK");
-      const signer = new ethers.Wallet(pk, ethers.getDefaultProvider(rpc));
-      const settlement = getSettlementContract(order.originChainId, signer);
-      if (!settlement) {
+      const signer = new ethers.Wallet(
+        pk,
+        ethers.getDefaultProvider(sourceChainRpc)
+      );
+      const settlementSourceChain = getSettlementContract(
+        order.originChainId,
+        signer
+      );
+      const settlementDestinationChain = getSettlementContract(
+        order.destinationChainId,
+        signer
+      );
+
+      if (!settlementSourceChain) {
         console.log(
           "No settlement contract found for chainId",
           order.originChainId
@@ -36,12 +53,35 @@ export class SolverService {
       }
       const orderPayload = this.orderToPayload(order);
       console.log("Calling settlement.initiate with", orderPayload);
-      const res = await settlement.initiate(
+      const res = await settlementSourceChain.initiate(
         orderPayload,
         order.signature,
         "0x"
       );
       console.log(res);
+
+      // Define native fee and quote for the message send operation
+      let nativeFee = 0n;
+
+      // const options = Options.newOptions().addExecutorLzReceiveOption(650000, 0).toHex().toString()
+      // const testMessage = solidityPacked(['bytes32', 'bytes32'], [getHash(orderSample), padAddress(operator.address)])
+      // try {
+      //   [nativeFee] = await settlementDestinationChain.quote.staticCall(
+      //     ENDPOINT_IDS[ChainId.MANTLE],
+      //     testMessage,
+      //     options,
+      //     false
+      //   );
+      // } catch (e: any) {
+      //   console.log(e.data);
+      // }
+
+      settlementDestinationChain.settle(
+        this.padAddress(signer.address),
+        orderPayload,
+        defaultAdapterParams,
+        { value: nativeFee }
+      );
     }
   }
 
