@@ -1,7 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { OrderService } from "../../order/service/order.service";
 import { OrderStatus } from "../../../model/order-status.enum";
-import { findWorkingRpc } from "../../../config/blockchains.config";
+import {
+  blockchainsConfig,
+  findWorkingRpc,
+} from "../../../config/blockchains.config";
 import { getSettlementContract } from "../../../shared/blockchain/settlement.contract";
 import { OrderLib } from "../../../types/Settlement";
 import { Order } from "../../../model/order.model";
@@ -21,7 +24,9 @@ export class SolverService {
     for (const order of orders) {
       console.log(order);
       const rpc = await findWorkingRpc(order.originChainId);
-      const settlement = getSettlementContract(order.originChainId, rpc);
+      const pk = this.configService.get("WALLET_PK");
+      const signer = new ethers.Wallet(pk, ethers.getDefaultProvider(rpc));
+      const settlement = getSettlementContract(order.originChainId, signer);
       if (!settlement) {
         console.log(
           "No settlement contract found for chainId",
@@ -29,36 +34,36 @@ export class SolverService {
         );
         continue;
       }
-
-      const pk = this.configService.get("WALLET_PK");
-      const signer = new ethers.Wallet(pk, rpc);
-      console.log("signer", signer);
-      settlement.connect(signer);
-      const res = await settlement.initiate(
-        this.orderToPayload(order),
-        order.signature,
-        ""
-      );
-
+      const orderPayload = this.orderToPayload(order);
+      console.log(orderPayload);
+      const res = await settlement.initiate(orderPayload, "0x", "0x");
       console.log(res);
     }
   }
 
   private orderToPayload(order: Order): OrderLib.CrossChainOrderStruct {
     return {
-      settlementContract: order.settlementContract,
-      swapper: order.swapperWallet,
+      settlementContract: this.padAddress(
+        blockchainsConfig[order.originChainId].settlementAddress
+      ),
+      swapper: this.padAddress(order.swapperWallet),
       nonce: order.nonce,
       originChainId: order.originChainId,
       initiateDeadline: order.initiateDeadlineBlock,
       fillDeadline: order.fillDeadlineBlock,
       destinationChainId: order.destinationChainId,
-      destinationReceiver: order.destinationToken,
-      destinationSettlementContract: ethers.utils.randomBytes(32),
-      originToken: order.originToken,
+      destinationReceiver: this.padAddress(order.swapperWallet),
+      destinationSettlementContract: this.padAddress(
+        blockchainsConfig[order.destinationChainId].settlementAddress
+      ),
+      originToken: this.padAddress(order.originToken),
       originAmount: order.originAmount,
-      destinationToken: order.destinationToken,
+      destinationToken: this.padAddress(order.destinationToken),
       destinationAmount: order.destinationAmount,
     };
+  }
+
+  private padAddress(address: string): string {
+    return address.replace("0x", "0x000000000000000000000000");
   }
 }

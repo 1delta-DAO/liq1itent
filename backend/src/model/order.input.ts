@@ -10,14 +10,6 @@ export class OrderInput {
     example: "0xE0582D2AbadAaa310EC35F56c56259c15C464F17",
     required: true,
   })
-  settlementContract: string;
-
-  @Length(32, 44)
-  @ApiProperty({
-    type: String,
-    example: "0xE0582D2AbadAaa310EC35F56c56259c15C464F17",
-    required: true,
-  })
   swapperWallet: string;
 
   @ApiProperty({
@@ -43,7 +35,7 @@ export class OrderInput {
 
   @ApiProperty({
     type: String,
-    example: "0x0",
+    example: "0x",
     required: true,
   })
   signature: string;
@@ -79,7 +71,7 @@ export class OrderInput {
   @Length(32, 44)
   @ApiProperty({
     type: String,
-    example: "0xE0582D2AbadAaa310EC35F56c56259c15C464F17",
+    example: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     required: true,
   })
   originToken: string;
@@ -101,7 +93,7 @@ export class OrderInput {
   @Length(32, 44)
   @ApiProperty({
     type: String,
-    example: "0xE0582D2AbadAaa310EC35F56c56259c15C464F17",
+    example: "0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8",
     required: true,
   })
   destinationToken: string;

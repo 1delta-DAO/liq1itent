@@ -7,7 +7,7 @@ import SettlementAbi from "../../abi/Settlement.json";
 
 export function getSettlementContract(
   chainId: ChainId,
-  provider: ethers.providers.Provider
+  provider: ethers.providers.Provider | ethers.Signer
 ): Settlement | undefined {
   const settlementContractAddress =
     blockchainsConfig[chainId].settlementAddress;

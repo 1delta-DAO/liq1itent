@@ -8,6 +8,8 @@ import {
   padAddress
 } from "../utils/order";
 import { getPackedSig } from "../utils/signature_utils";
+import Web3 from "web3";
+import { RegisteredSubscription } from "web3-eth";
 
 interface UseSignOrder {
   signOrder: (
@@ -36,6 +38,22 @@ export const useSignOrder = (): UseSignOrder => {
       return await getPackedSig(hash, library)
     }
     return '0x'
+  };
+
+  async function signOrderWithProvider(
+    order: CrossChainOrder,
+    provider: Web3<RegisteredSubscription>,
+  ): Promise<string> {
+    const hash = getHash(order)
+    const fromAddress = (await provider.eth.getAccounts())[0]
+
+    const signedMessage = fromAddress ? await provider.eth.personal.sign(
+      hash,
+      fromAddress,
+      'test password!'
+    ) : "";
+
+    return signedMessage;
   };
 
   const constructOrder = (
